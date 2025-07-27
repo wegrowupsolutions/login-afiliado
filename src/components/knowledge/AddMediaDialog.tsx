@@ -280,47 +280,6 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
             </div>
           )}
 
-          {(mediaType === 'video' || mediaType === 'audio') && (
-            <div className="space-y-2">
-              <Label htmlFor="duration">Duração (segundos)</Label>
-              <Input
-                id="duration"
-                type="number"
-                value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                placeholder="Duração em segundos"
-              />
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Categoria</Label>
-            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Sem categoria">Sem categoria</SelectItem>
-                <SelectItem value="Educacional">Educacional</SelectItem>
-                <SelectItem value="Entretenimento">Entretenimento</SelectItem>
-                <SelectItem value="Documentação">Documentação</SelectItem>
-                <SelectItem value="Tutorial">Tutorial</SelectItem>
-                <SelectItem value="Referência">Referência</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder={`Descrição do ${getMediaTypeLabel().toLowerCase()}`}
-              rows={3}
-            />
-          </div>
-
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
