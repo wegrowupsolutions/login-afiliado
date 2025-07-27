@@ -61,8 +61,14 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
       
+      // Choose the correct bucket based on media type
+      let bucketName = 'videos'; // default
+      if (mediaType === 'image') bucketName = 'images';
+      else if (mediaType === 'audio') bucketName = 'audio';
+      else if (mediaType === 'document') bucketName = 'videos'; // use videos bucket for documents for now
+      
       const { data, error } = await supabase.storage
-        .from('videos')
+        .from(bucketName)
         .upload(fileName, file);
 
       if (error) {
@@ -77,7 +83,7 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
 
       // Get the public URL
       const { data: { publicUrl } } = supabase.storage
-        .from('videos')
+        .from(bucketName)
         .getPublicUrl(data.path);
 
       return publicUrl;
@@ -111,21 +117,11 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
       return;
     }
 
-    // For video, always require file upload
-    if (mediaType === 'video' && !selectedFile) {
+    // Always require file upload for all media types
+    if (!selectedFile) {
       toast({
         title: "Arquivo obrigatório",
         description: "Por favor, selecione um arquivo para upload.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // For other media types, require URL
-    if (mediaType !== 'video' && !formData.file_url.trim()) {
-      toast({
-        title: "URL obrigatória",
-        description: "Por favor, preencha a URL do arquivo.",
         variant: "destructive",
       });
       return;
@@ -137,17 +133,13 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
     let thumbnailUrl = '';
 
     try {
-      if (mediaType === 'video' && selectedFile) {
-        const uploadedUrl = await uploadFileToStorage(selectedFile);
-        if (!uploadedUrl) {
-          setIsLoading(false);
-          return;
-        }
-        finalFileUrl = uploadedUrl;
-      } else {
-        finalFileUrl = formData.file_url.trim();
-        thumbnailUrl = formData.thumbnail_url.trim();
+      // Always use file upload for all media types
+      const uploadedUrl = await uploadFileToStorage(selectedFile);
+      if (!uploadedUrl) {
+        setIsLoading(false);
+        return;
       }
+      finalFileUrl = uploadedUrl;
 
       const mediaData = {
         title: formData.title.trim(),
@@ -268,15 +260,48 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
           )}
 
           {mediaType !== 'video' && (
-            <div className="space-y-2">
-              <Label htmlFor="file_url">URL do Arquivo *</Label>
-              <Input
-                id="file_url"
-                value={formData.file_url}
-                onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
-                placeholder={`URL do ${getMediaTypeLabel().toLowerCase()}`}
-                required
-              />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
+                  <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-lg font-medium mb-2">Clique para selecionar ou arraste o arquivo aqui</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {mediaType === 'image' && 'JPG, PNG, GIF, WEBP'}
+                    {mediaType === 'audio' && 'MP3, WAV, OGG, M4A'}
+                    {mediaType === 'document' && 'PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX'}
+                  </p>
+                  <Input
+                    id="file_upload"
+                    type="file"
+                    accept={
+                      mediaType === 'image' ? 'image/*' :
+                      mediaType === 'audio' ? 'audio/*' :
+                      mediaType === 'document' ? '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx' :
+                      '*/*'
+                    }
+                    onChange={handleFileChange}
+                    className="hidden"
+                    required
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => document.getElementById('file_upload')?.click()}
+                  >
+                    Selecionar Arquivo
+                  </Button>
+                </div>
+                {selectedFile && (
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <p className="text-sm font-medium text-foreground">
+                      Arquivo selecionado: {selectedFile.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Tamanho: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
