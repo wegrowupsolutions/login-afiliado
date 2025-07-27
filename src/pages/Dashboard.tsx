@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useDashboardRealtime } from '@/hooks/useDashboardRealtime';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import { AppLayout } from '@/components/layout/AppLayout';
 import MetricsCard from '@/components/dashboard/MetricsCard';
 import ChatsCard from '@/components/dashboard/ChatsCard';
 import KnowledgeCard from '@/components/dashboard/KnowledgeCard';
@@ -11,6 +11,8 @@ import ClientsCard from '@/components/dashboard/ClientsCard';
 import EvolutionCard from '@/components/dashboard/EvolutionCard';
 import ScheduleCard from '@/components/dashboard/ScheduleCard';
 import ConfigCard from '@/components/dashboard/ConfigCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendingUp, Users, Bot, Calendar } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, isLoading } = useAuth();
@@ -27,22 +29,91 @@ const Dashboard = () => {
   
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-petshop-blue dark:bg-gray-900">
-        <div className="h-16 w-16 border-4 border-t-transparent border-petshop-gold rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 border-4 border-t-transparent border-primary rounded-full animate-spin"></div>
+          <p className="text-sm text-muted-foreground">Carregando...</p>
+        </div>
       </div>
     );
   }
   
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      <DashboardHeader />
-      
-      <main className="container mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold text-center mb-10 text-gray-800 dark:text-gray-100 transition-colors duration-300">
-          Painel Administrativo
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+    <AppLayout>
+      <div className="p-6 space-y-6">
+        {/* Welcome Section */}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Bem-vindo ao painel de controle do Afiliado IA
+          </p>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="border-l-4 border-l-primary">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total de Clientes
+              </CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">
+                +0% do mês passado
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-l-4 border-l-green-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Conversas Ativas
+              </CardTitle>
+              <Bot className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">
+                +0% do mês passado
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-l-4 border-l-blue-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Agendamentos
+              </CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">
+                +0% do mês passado
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-l-4 border-l-orange-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Taxa de Conversão
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0%</div>
+              <p className="text-xs text-muted-foreground">
+                +0% do mês passado
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Dashboard Cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <MetricsCard />
           <ChatsCard />
           <KnowledgeCard />
@@ -51,8 +122,8 @@ const Dashboard = () => {
           <ScheduleCard />
           <ConfigCard />
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 

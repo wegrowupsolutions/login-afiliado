@@ -19,6 +19,11 @@ export default {
 			}
 		},
 		extend: {
+			// Modern Typography
+			fontFamily: {
+				sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+				mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
