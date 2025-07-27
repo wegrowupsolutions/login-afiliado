@@ -18,7 +18,7 @@ const DashboardHeader = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              Pet Paradise
+              Afiliado IA
             </h1>
             <p className="text-sm text-white/70">Dashboard Principal</p>
           </div>
