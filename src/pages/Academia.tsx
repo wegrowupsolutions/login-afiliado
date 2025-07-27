@@ -3,16 +3,20 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Clock, Users, Star } from 'lucide-react';
+import VideoDialog from '@/components/ui/video-dialog';
 
 const Academia = () => {
+  const [selectedVideo, setSelectedVideo] = React.useState<{ id: number; title: string; url: string } | null>(null);
+  
   const videos = [
     {
       id: 1,
       title: "Introdução ao Afiliado IA",
       description: "Aprenda os conceitos básicos da plataforma",
       duration: "5:30",
-      thumbnail: "/lovable-uploads/68e40dc0-6a1c-433e-bc04-d6fffca06b44.png",
-      category: "Básico"
+      thumbnail: "/lovable-uploads/54648612-d1e4-480f-964e-a7e342fcbd46.png",
+      category: "Básico",
+      url: "https://youtu.be/9lU4n088ghU"
     },
     {
       id: 2,
@@ -20,7 +24,8 @@ const Academia = () => {
       description: "Passo a passo para conectar o Evolution API",
       duration: "8:45",
       thumbnail: "/lovable-uploads/68e40dc0-6a1c-433e-bc04-d6fffca06b44.png",
-      category: "Configuração"
+      category: "Configuração",
+      url: "https://youtu.be/9lU4n088ghU"
     },
     {
       id: 3,
@@ -28,7 +33,8 @@ const Academia = () => {
       description: "Organize e gerencie sua base de clientes",
       duration: "6:20",
       thumbnail: "/lovable-uploads/68e40dc0-6a1c-433e-bc04-d6fffca06b44.png",
-      category: "Gestão"
+      category: "Gestão",
+      url: "https://youtu.be/9lU4n088ghU"
     },
     {
       id: 4,
@@ -36,7 +42,8 @@ const Academia = () => {
       description: "Entenda os relatórios e dashboards",
       duration: "7:15",
       thumbnail: "/lovable-uploads/68e40dc0-6a1c-433e-bc04-d6fffca06b44.png",
-      category: "Análise"
+      category: "Análise",
+      url: "https://youtu.be/9lU4n088ghU"
     },
     {
       id: 5,
@@ -44,7 +51,8 @@ const Academia = () => {
       description: "Configurações avançadas de automação",
       duration: "12:30",
       thumbnail: "/lovable-uploads/68e40dc0-6a1c-433e-bc04-d6fffca06b44.png",
-      category: "Avançado"
+      category: "Avançado",
+      url: "https://youtu.be/9lU4n088ghU"
     },
     {
       id: 6,
@@ -52,7 +60,8 @@ const Academia = () => {
       description: "Como integrar com outras plataformas",
       duration: "9:40",
       thumbnail: "/lovable-uploads/68e40dc0-6a1c-433e-bc04-d6fffca06b44.png",
-      category: "Integrações"
+      category: "Integrações",
+      url: "https://youtu.be/9lU4n088ghU"
     }
   ];
 
@@ -64,8 +73,10 @@ const Academia = () => {
     : videos.filter(video => video.category === selectedCategory);
 
   const handleVideoClick = (videoId: number) => {
-    console.log(`Playing video ${videoId}`);
-    // Aqui você pode implementar a lógica para reproduzir o vídeo
+    const video = videos.find(v => v.id === videoId);
+    if (video) {
+      setSelectedVideo({ id: video.id, title: video.title, url: video.url });
+    }
   };
 
   return (
@@ -147,9 +158,16 @@ const Academia = () => {
               onClick={() => handleVideoClick(video.id)}
             >
               <div className="relative">
-                <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-t-lg flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white/80 dark:bg-black/50 rounded-full flex items-center justify-center shadow-lg">
-                    <Play className="h-8 w-8 text-purple-600 ml-1" />
+                <div className="aspect-video rounded-t-lg overflow-hidden">
+                  <img 
+                    src={video.thumbnail} 
+                    alt={video.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/90 dark:bg-black/70 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                      <Play className="h-8 w-8 text-purple-600 ml-1" />
+                    </div>
                   </div>
                 </div>
                 <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
@@ -204,6 +222,16 @@ const Academia = () => {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Video Dialog */}
+        {selectedVideo && (
+          <VideoDialog
+            open={!!selectedVideo}
+            onOpenChange={(open) => !open && setSelectedVideo(null)}
+            videoUrl={selectedVideo.url}
+            title={selectedVideo.title}
+          />
+        )}
       </div>
     </AppLayout>
   );
