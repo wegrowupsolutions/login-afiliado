@@ -1,6 +1,8 @@
 
 import React, { useEffect } from 'react';
-import { LineChart, Users, Smartphone, PawPrint, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { LineChart, Users, Smartphone, PawPrint, MessageCircle, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useClientStats } from '@/hooks/useClientStats';
 import { useDashboardRealtime } from '@/hooks/useDashboardRealtime';
 import { useConversations } from '@/hooks/useConversations';
@@ -14,6 +16,7 @@ import ServicesBarChart from '@/components/metrics/ServicesBarChart';
 import RecentClientsTable from '@/components/metrics/RecentClientsTable';
 
 const MetricsDashboard = () => {
+  const navigate = useNavigate();
   const { stats, loading, refetchStats } = useClientStats();
   const { conversations, loading: conversationsLoading } = useConversations();
   
@@ -67,6 +70,17 @@ const MetricsDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <div className="p-4 border-b bg-background">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate('/dashboard')}
+          className="hover:bg-muted"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar ao Dashboard
+        </Button>
+      </div>
       {/* Header */}
       <DashboardHeader />
       

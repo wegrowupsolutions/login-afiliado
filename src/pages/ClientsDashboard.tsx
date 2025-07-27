@@ -3,6 +3,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import ClientsHeader from '@/components/clients/ClientsHeader';
 import ClientSearchBar from '@/components/clients/ClientSearchBar';
 import ClientsTable from '@/components/clients/ClientsTable';
@@ -62,6 +64,17 @@ const ClientsDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <div className="p-4 border-b bg-background">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate('/dashboard')}
+          className="hover:bg-muted"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar ao Dashboard
+        </Button>
+      </div>
       <ClientsHeader />
       
       <main className="container mx-auto px-4 py-8">

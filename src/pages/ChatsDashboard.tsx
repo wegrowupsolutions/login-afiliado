@@ -1,7 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import ChatHeader from '@/components/chat/ChatHeader';
 import ChatLayout from '@/components/chat/ChatLayout';
 import { useConversations } from '@/hooks/useConversations';
@@ -11,6 +14,7 @@ import PauseDurationDialog from '@/components/PauseDurationDialog';
 
 const ChatsDashboard = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState('');
@@ -136,6 +140,17 @@ const ChatsDashboard = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <div className="p-4 border-b bg-background">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate('/dashboard')}
+          className="hover:bg-muted"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar ao Dashboard
+        </Button>
+      </div>
       <ChatHeader signOut={signOut} />
       
       <PauseDurationDialog 

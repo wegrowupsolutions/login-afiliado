@@ -1,12 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Clock, Users, Star } from 'lucide-react';
+import { Play, Clock, Users, Star, ArrowLeft } from 'lucide-react';
 import VideoDialog from '@/components/ui/video-dialog';
 
 const Academia = () => {
   const [selectedVideo, setSelectedVideo] = React.useState<{ id: number; title: string; url: string } | null>(null);
+  const navigate = useNavigate();
   
   const videos = [
     {
@@ -77,12 +79,22 @@ const Academia = () => {
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-              <Play className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-            </div>
-            Academia Afiliado IA
-          </h1>
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate('/dashboard')}
+              className="hover:bg-muted"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                <Play className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              Academia Afiliado IA
+            </h1>
+          </div>
           <p className="text-muted-foreground">
             Aprenda a usar a plataforma com nossos vídeos explicativos
           </p>
