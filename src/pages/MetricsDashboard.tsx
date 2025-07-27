@@ -92,16 +92,6 @@ const MetricsDashboard = () => {
           />
           
           <StatCard 
-            title="Total de Pets"
-            value={stats.totalPets}
-            icon={<PawPrint />}
-            trend={`Média de ${(stats.totalPets / (stats.totalClients || 1)).toFixed(1)} pets por cliente`}
-            loading={loading}
-            iconBgClass="bg-pink-100 dark:bg-pink-900/30"
-            iconTextClass="text-pink-600 dark:text-pink-400"
-          />
-          
-          <StatCard 
             title="Novos Clientes (Mês)"
             value={stats.newClientsThisMonth}
             icon={<Smartphone />}
