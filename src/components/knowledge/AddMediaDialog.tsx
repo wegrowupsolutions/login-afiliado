@@ -111,28 +111,21 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
       return;
     }
 
-    if (uploadMethod === 'url' && !formData.file_url.trim()) {
-      toast({
-        title: "URL obrigatória",
-        description: "Por favor, preencha a URL do arquivo.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (uploadMethod === 'youtube' && !formData.youtube_url.trim()) {
-      toast({
-        title: "URL do YouTube obrigatória",
-        description: "Por favor, preencha a URL do YouTube.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (uploadMethod === 'file' && !selectedFile) {
+    // For video, always require file upload
+    if (mediaType === 'video' && !selectedFile) {
       toast({
         title: "Arquivo obrigatório",
         description: "Por favor, selecione um arquivo para upload.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // For other media types, require URL
+    if (mediaType !== 'video' && !formData.file_url.trim()) {
+      toast({
+        title: "URL obrigatória",
+        description: "Por favor, preencha a URL do arquivo.",
         variant: "destructive",
       });
       return;
@@ -144,26 +137,13 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
     let thumbnailUrl = '';
 
     try {
-      if (uploadMethod === 'file' && selectedFile) {
+      if (mediaType === 'video' && selectedFile) {
         const uploadedUrl = await uploadFileToStorage(selectedFile);
         if (!uploadedUrl) {
           setIsLoading(false);
           return;
         }
         finalFileUrl = uploadedUrl;
-      } else if (uploadMethod === 'youtube') {
-        const videoId = getYouTubeVideoId(formData.youtube_url);
-        if (!videoId) {
-          toast({
-            title: "URL inválida",
-            description: "Por favor, insira uma URL válida do YouTube.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-        finalFileUrl = `https://www.youtube.com/embed/${videoId}`;
-        thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
       } else {
         finalFileUrl = formData.file_url.trim();
         thumbnailUrl = formData.thumbnail_url.trim();
@@ -251,78 +231,40 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
           </div>
 
           {mediaType === 'video' && (
-            <Tabs value={uploadMethod} onValueChange={(value) => setUploadMethod(value as any)}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="url" className="flex items-center gap-2">
-                  <Link className="h-4 w-4" />
-                  URL
-                </TabsTrigger>
-                <TabsTrigger value="youtube" className="flex items-center gap-2">
-                  <Youtube className="h-4 w-4" />
-                  YouTube
-                </TabsTrigger>
-                <TabsTrigger value="file" className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Upload
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="url" className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="file_url">URL do Vídeo *</Label>
-                  <Input
-                    id="file_url"
-                    value={formData.file_url}
-                    onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
-                    placeholder="https://exemplo.com/video.mp4"
-                    required={uploadMethod === 'url'}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="thumbnail_url">URL da Thumbnail</Label>
-                  <Input
-                    id="thumbnail_url"
-                    value={formData.thumbnail_url}
-                    onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
-                    placeholder="URL da imagem de capa"
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="youtube" className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="youtube_url">URL do YouTube *</Label>
-                  <Input
-                    id="youtube_url"
-                    value={formData.youtube_url}
-                    onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    required={uploadMethod === 'youtube'}
-                  />
-                  <p className="text-sm text-gray-500">
-                    Cole a URL do vídeo do YouTube aqui. A thumbnail será gerada automaticamente.
-                  </p>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="file" className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="file_upload">Selecionar Arquivo *</Label>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
+                  <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-lg font-medium mb-2">Clique para selecionar ou arraste o arquivo aqui</p>
+                  <p className="text-sm text-muted-foreground mb-4">MP4, AVI, MOV, WMV</p>
                   <Input
                     id="file_upload"
                     type="file"
                     accept="video/*"
                     onChange={handleFileChange}
-                    required={uploadMethod === 'file'}
+                    className="hidden"
+                    required
                   />
-                  {selectedFile && (
-                    <p className="text-sm text-green-600">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => document.getElementById('file_upload')?.click()}
+                  >
+                    Selecionar Arquivo
+                  </Button>
+                </div>
+                {selectedFile && (
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <p className="text-sm font-medium text-foreground">
                       Arquivo selecionado: {selectedFile.name}
                     </p>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
+                    <p className="text-xs text-muted-foreground">
+                      Tamanho: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
 
           {mediaType !== 'video' && (
