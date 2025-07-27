@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Link, PawPrint, Plus, QrCode, Loader2, RefreshCw, Check } from 'lucide-react';
+import { ArrowLeft, Link, Bot, Plus, QrCode, Loader2, RefreshCw, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -299,7 +299,7 @@ const Evolution = () => {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <PawPrint className="h-8 w-8 text-petshop-gold" />
+            <Bot className="h-8 w-8 text-petshop-gold" />
             <h1 className="text-2xl font-bold">Pet Paradise</h1>
           </div>
           <div className="flex items-center gap-4">
