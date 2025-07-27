@@ -25,10 +25,18 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				// Tech color palette based on reference images
+				'tech-primary': 'hsl(var(--tech-primary))',
+				'tech-secondary': 'hsl(var(--tech-secondary))',
+				'tech-tertiary': 'hsl(var(--tech-tertiary))',
+				'tech-quaternary': 'hsl(var(--tech-quaternary))',
+				'tech-accent': 'hsl(var(--tech-accent))',
+				
+				// Legacy petshop colors (for compatibility)
 				petshop: {
-					blue: 'hsl(var(--petshop-blue))',
-					gold: 'hsl(var(--petshop-gold))',
-					navy: 'hsl(var(--tertiary-dark))',
+					blue: 'hsl(var(--tech-primary))',
+					gold: 'hsl(var(--tech-accent))',
+					navy: 'hsl(var(--tech-quaternary))',
 				},
 				palette: {
 					'primary-turquoise': 'hsl(var(--primary-turquoise))',

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import { PawPrint, Mail, Lock, Eye, EyeOff, Heart, Sparkles } from 'lucide-react';
+import { Bot, Mail, Lock, Eye, EyeOff, Cpu, Microchip, Zap } from 'lucide-react';
 import { z } from 'zod';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -121,37 +121,32 @@ const Index = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-petshop-blue dark:bg-gray-900">
-        <div className="h-16 w-16 border-4 border-t-transparent border-petshop-gold rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-tech-quaternary to-tech-primary">
+        <div className="h-16 w-16 border-4 border-t-transparent border-tech-accent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden">
+    <div className="min-h-screen flex relative overflow-hidden bg-gradient-to-br from-tech-quaternary via-tech-tertiary to-tech-primary">
       <div className="absolute top-4 right-4 z-30">
         <ThemeToggle />
       </div>
       
       <div className="absolute inset-0 z-0">
-        <img 
-          src="/lovable-uploads/7a96682a-47a3-4ed0-8036-8a31ad28cb4b.png" 
-          alt="Pet background" 
-          className="w-full h-full object-cover transition-opacity duration-1000 opacity-80"
-        />
-        <div className="absolute inset-0 backdrop-blur-md bg-petshop-blue/30 dark:bg-gray-900/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-tech-quaternary via-tech-tertiary/50 to-tech-primary opacity-95"></div>
       </div>
       
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-10">
-        <div className="absolute top-[10%] left-[5%] w-28 h-28 rounded-full bg-petshop-gold dark:bg-amber-500 opacity-20 animate-float"></div>
-        <div className="absolute bottom-[20%] right-[10%] w-40 h-40 rounded-full bg-petshop-gold dark:bg-amber-500 opacity-10 animate-float" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-[40%] right-[20%] w-24 h-24 rounded-full bg-petshop-gold dark:bg-amber-500 opacity-15 animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-[10%] left-[5%] w-28 h-28 rounded-full bg-tech-accent/20 animate-float"></div>
+        <div className="absolute bottom-[20%] right-[10%] w-40 h-40 rounded-full bg-tech-primary/10 animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-[40%] right-[20%] w-24 h-24 rounded-full bg-tech-secondary/15 animate-float" style={{ animationDelay: '2s' }}></div>
         
-        <PawPrint className="absolute top-[15%] right-[25%] w-16 h-16 text-white opacity-10 animate-bounce" style={{ animationDelay: '1.5s' }} />
-        <PawPrint className="absolute bottom-[30%] left-[15%] w-20 h-20 text-white opacity-10 animate-float" style={{ animationDelay: '2.5s' }} />
-        <PawPrint className="absolute top-[60%] right-[10%] w-12 h-12 text-petshop-gold dark:text-amber-500 opacity-15 animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <Heart className="absolute top-[25%] left-[30%] w-10 h-10 text-petshop-gold dark:text-amber-500 opacity-15 animate-pulse" style={{ animationDelay: '1.2s' }} />
-        <Sparkles className="absolute bottom-[15%] right-[25%] w-14 h-14 text-white opacity-10 animate-pulse" style={{ animationDelay: '1.8s' }} />
+        <Bot className="absolute top-[15%] right-[25%] w-16 h-16 text-white/10 animate-bounce" style={{ animationDelay: '1.5s' }} />
+        <Cpu className="absolute bottom-[30%] left-[15%] w-20 h-20 text-white/10 animate-float" style={{ animationDelay: '2.5s' }} />
+        <Microchip className="absolute top-[60%] right-[10%] w-12 h-12 text-tech-accent/15 animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <Zap className="absolute top-[25%] left-[30%] w-10 h-10 text-tech-primary/15 animate-pulse" style={{ animationDelay: '1.2s' }} />
+        <Bot className="absolute bottom-[15%] right-[25%] w-14 h-14 text-white/10 animate-pulse" style={{ animationDelay: '1.8s' }} />
       </div>
       
       <div 
@@ -172,32 +167,32 @@ const Index = () => {
 
             <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
               <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 group-hover:text-petshop-gold transition-colors duration-300" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 group-hover:text-tech-accent transition-colors duration-300" />
                 <Input
                   type="email"
                   name="email"
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`pl-10 h-12 bg-white/10 dark:bg-gray-700/50 border-white/20 text-white rounded-md transition-all duration-300 hover:border-petshop-gold/50 ${errors.email ? 'border-red-400' : 'focus:border-petshop-gold'}`}
+                  className={`pl-10 h-12 bg-white/10 dark:bg-gray-700/50 border-white/20 text-white rounded-md transition-all duration-300 hover:border-tech-accent/50 ${errors.email ? 'border-red-400' : 'focus:border-tech-accent'}`}
                 />
                 {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
               </div>
 
               <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 group-hover:text-petshop-gold transition-colors duration-300" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 group-hover:text-tech-accent transition-colors duration-300" />
                 <Input
                   type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Senha"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`pl-10 h-12 bg-white/10 dark:bg-gray-700/50 border-white/20 text-white rounded-md transition-all duration-300 hover:border-petshop-gold/50 ${errors.password ? 'border-red-400' : 'focus:border-petshop-gold'}`}
+                  className={`pl-10 h-12 bg-white/10 dark:bg-gray-700/50 border-white/20 text-white rounded-md transition-all duration-300 hover:border-tech-accent/50 ${errors.password ? 'border-red-400' : 'focus:border-tech-accent'}`}
                 />
                 <button 
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 hover:text-petshop-gold transition-colors duration-300"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 hover:text-tech-accent transition-colors duration-300"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -212,13 +207,13 @@ const Index = () => {
                     <input
                       type="checkbox"
                       id="remember"
-                      className="w-4 h-4 bg-white/10 dark:bg-gray-700/50 border-white/20 rounded focus:ring-petshop-gold text-petshop-gold"
+                      className="w-4 h-4 bg-white/10 dark:bg-gray-700/50 border-white/20 rounded focus:ring-tech-accent text-tech-accent"
                     />
                     <label htmlFor="remember" className="ml-2 text-sm text-white/80 hover:text-white transition-colors duration-300">
                       Lembrar-me
                     </label>
                   </div>
-                  <a href="#" className="text-sm text-petshop-gold hover:text-white transition-colors duration-300">
+                  <a href="#" className="text-sm text-tech-accent hover:text-white transition-colors duration-300">
                     Esqueceu a senha?
                   </a>
                 </>
@@ -228,13 +223,13 @@ const Index = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full button-hover-effect bg-petshop-gold hover:bg-amber-500 text-petshop-blue dark:text-gray-900 font-bold py-3 px-4 rounded-md flex items-center justify-center transition-all duration-300 animate-slide-up"
+              className="w-full button-hover-effect bg-tech-primary hover:bg-tech-secondary text-white font-bold py-3 px-4 rounded-md flex items-center justify-center transition-all duration-300 animate-slide-up"
               style={{ animationDelay: '0.6s' }}
             >
               {isLoading ? (
-                <div className="h-5 w-5 border-2 border-petshop-blue dark:border-gray-900 border-t-transparent rounded-full animate-spin mr-2"></div>
+                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
               ) : (
-                <PawPrint className="mr-2 h-5 w-5" />
+                <Bot className="mr-2 h-5 w-5" />
               )}
               {isLoading ? (isSignUpMode ? "Criando conta..." : "Entrando...") : (isSignUpMode ? "Criar Conta" : "Login")}
             </button>
@@ -247,7 +242,7 @@ const Index = () => {
                   setErrors({});
                   setFormData({ email: '', password: '' });
                 }}
-                className="text-sm text-petshop-gold hover:text-white transition-colors duration-300"
+                className="text-sm text-tech-accent hover:text-white transition-colors duration-300"
               >
                 {isSignUpMode ? 'Já tem uma conta? Faça login' : 'Não tem uma conta? Criar conta'}
               </button>

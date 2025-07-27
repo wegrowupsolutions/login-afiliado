@@ -45,12 +45,19 @@
     --sidebar-border: 210 40% 88%;
     --sidebar-ring: 174 80% 45%;
     
-    /* Primary Neutral Palette - Modern Futuristic */
-    --primary-turquoise: 174 80% 45%;
-    --main-teal: 174 72% 35%;
-    --secondary-slate: 215 16% 47%;
-    --tertiary-dark: 217 32% 17%;
-    --quaternary-black: 220 50% 10%;
+    /* Tech Color Palette - Based on reference */
+    --tech-primary: 174 72% 56%; /* Main turquoise */
+    --tech-secondary: 174 50% 45%; /* Darker turquoise */
+    --tech-tertiary: 220 20% 55%; /* Blue gray */
+    --tech-quaternary: 220 25% 25%; /* Dark gray */
+    --tech-accent: 180 100% 70%; /* Bright cyan */
+    
+    /* Legacy palette for compatibility */
+    --primary-turquoise: 174 72% 56%;
+    --main-teal: 174 50% 45%;
+    --secondary-slate: 220 20% 55%;
+    --tertiary-dark: 220 25% 25%;
+    --quaternary-black: 220 25% 15%;
     
     /* Grey Scale - Refined */
     --grey-50: 220 50% 10%;
