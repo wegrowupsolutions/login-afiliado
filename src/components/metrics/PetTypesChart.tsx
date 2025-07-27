@@ -21,7 +21,7 @@ const PetTypesChart: React.FC<PetTypesChartProps> = ({ data, loading = false }) 
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
           <PawPrint className="h-5 w-5 text-pink-600 dark:text-pink-400" />
-          Tipos de Pets Atendidos
+          Tipos de Clientes
         </CardTitle>
       </CardHeader>
       <CardContent>
