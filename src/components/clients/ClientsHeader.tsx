@@ -11,7 +11,11 @@ const ClientsHeader = () => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">CRM de Clientes</h1>
         <div className="flex items-center gap-4">
-          <Button variant="default" onClick={() => navigate('/dashboard')} className="bg-petshop-gold hover:bg-amber-500 text-petshop-blue">
+          <Button 
+            variant="secondary" 
+            onClick={() => navigate('/dashboard')} 
+            className="bg-secondary/80 hover:bg-secondary text-secondary-foreground border border-primary/20 hover:border-primary/40 transition-all duration-200"
+          >
             Voltar para Dashboard
           </Button>
         </div>
