@@ -14,6 +14,7 @@ import Evolution from "./pages/Evolution";
 import Schedule from "./pages/Schedule";
 import NotFound from "./pages/NotFound";
 import ConfigurationManager from "./pages/ConfigurationManager";
+import Academia from "./pages/Academia";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/clients" element={<ClientsDashboard />} />
               <Route path="/evolution" element={<Evolution />} />
               <Route path="/schedule" element={<Schedule />} />
+              <Route path="/academia" element={<Academia />} />
               <Route path="/configuration" element={<ConfigurationManager />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

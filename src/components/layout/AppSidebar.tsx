@@ -9,7 +9,8 @@ import {
   FileText,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Play
 } from 'lucide-react';
 import {
   Sidebar,
@@ -67,6 +68,12 @@ const navigationItems = [
     url: '/knowledge',
     icon: FileText,
     description: 'Base de conhecimento'
+  },
+  {
+    title: 'Academia',
+    url: '/academia',
+    icon: Play,
+    description: 'Vídeos explicativos'
   },
   {
     title: 'Configurações',
