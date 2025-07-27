@@ -12,6 +12,10 @@ type AuthContextType = {
     error: AuthError | null;
     data: Session | null;
   }>;
+  signUp: (email: string, password: string) => Promise<{
+    error: AuthError | null;
+    data: any;
+  }>;
   signOut: () => Promise<void>;
 };
 
@@ -55,6 +59,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  const signUp = async (email: string, password: string) => {
+    setIsLoading(true);
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const response = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl
+      }
+    });
+    
+    setIsLoading(false);
+    return {
+      error: response.error,
+      data: response.data
+    };
+  };
+
   const signOut = async () => {
     setIsLoading(true);
     await supabase.auth.signOut();
@@ -67,6 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     isLoading,
     signIn,
+    signUp,
     signOut,
   };
 

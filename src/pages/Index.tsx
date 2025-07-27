@@ -14,7 +14,8 @@ const loginSchema = z.object({
 
 const Index = () => {
   const navigate = useNavigate();
-  const { signIn, user, isLoading: authLoading } = useAuth();
+  const { signIn, signUp, user, isLoading: authLoading } = useAuth();
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -89,18 +90,30 @@ const Index = () => {
     setIsLoading(true);
     
     try {
-      const { error } = await signIn(formData.email, formData.password);
-      
-      if (error) {
-        console.error('Login error:', error);
-        toast.error(error.message || 'Erro ao fazer login. Tente novamente.');
+      if (isSignUpMode) {
+        const { error } = await signUp(formData.email, formData.password);
+        
+        if (error) {
+          console.error('Signup error:', error);
+          toast.error(error.message || 'Erro ao criar conta. Tente novamente.');
+        } else {
+          toast.success('Conta criada com sucesso! Verifique seu email para confirmar.');
+          setIsSignUpMode(false); // Switch back to login mode
+        }
       } else {
-        toast.success('Login realizado com sucesso!');
-        // Navigate is handled by the auth state change in AuthContext
+        const { error } = await signIn(formData.email, formData.password);
+        
+        if (error) {
+          console.error('Login error:', error);
+          toast.error(error.message || 'Erro ao fazer login. Tente novamente.');
+        } else {
+          toast.success('Login realizado com sucesso!');
+          // Navigate is handled by the auth state change in AuthContext
+        }
       }
     } catch (error) {
       console.error('Unexpected error:', error);
-      toast.error('Erro ao fazer login. Tente novamente.');
+      toast.error(isSignUpMode ? 'Erro ao criar conta. Tente novamente.' : 'Erro ao fazer login. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -151,10 +164,10 @@ const Index = () => {
             style={{ backdropFilter: "blur(16px)" }}
           >
             <h1 className="text-2xl font-bold text-white text-center mb-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              Bem-vindo ao Pet Paradise!
+              {isSignUpMode ? 'Criar Conta' : 'Bem-vindo ao Afiliado IA!'}
             </h1>
             <p className="text-white/80 text-center mb-6 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              Entre para gerenciar seu petshop
+              {isSignUpMode ? 'Crie sua conta para acessar a plataforma' : 'Entre para gerenciar sua plataforma'}
             </p>
 
             <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
@@ -193,19 +206,23 @@ const Index = () => {
             </div>
 
             <div className="flex items-center justify-between animate-slide-up" style={{ animationDelay: '0.5s' }}>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  className="w-4 h-4 bg-white/10 dark:bg-gray-700/50 border-white/20 rounded focus:ring-petshop-gold text-petshop-gold"
-                />
-                <label htmlFor="remember" className="ml-2 text-sm text-white/80 hover:text-white transition-colors duration-300">
-                  Lembrar-me
-                </label>
-              </div>
-              <a href="#" className="text-sm text-petshop-gold hover:text-white transition-colors duration-300">
-                Esqueceu a senha?
-              </a>
+              {!isSignUpMode && (
+                <>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="remember"
+                      className="w-4 h-4 bg-white/10 dark:bg-gray-700/50 border-white/20 rounded focus:ring-petshop-gold text-petshop-gold"
+                    />
+                    <label htmlFor="remember" className="ml-2 text-sm text-white/80 hover:text-white transition-colors duration-300">
+                      Lembrar-me
+                    </label>
+                  </div>
+                  <a href="#" className="text-sm text-petshop-gold hover:text-white transition-colors duration-300">
+                    Esqueceu a senha?
+                  </a>
+                </>
+              )}
             </div>
 
             <button
@@ -219,8 +236,22 @@ const Index = () => {
               ) : (
                 <PawPrint className="mr-2 h-5 w-5" />
               )}
-              {isLoading ? "Entrando..." : "Login"}
+              {isLoading ? (isSignUpMode ? "Criando conta..." : "Entrando...") : (isSignUpMode ? "Criar Conta" : "Login")}
             </button>
+
+            <div className="text-center animate-slide-up" style={{ animationDelay: '0.7s' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUpMode(!isSignUpMode);
+                  setErrors({});
+                  setFormData({ email: '', password: '' });
+                }}
+                className="text-sm text-petshop-gold hover:text-white transition-colors duration-300"
+              >
+                {isSignUpMode ? 'Já tem uma conta? Faça login' : 'Não tem uma conta? Criar conta'}
+              </button>
+            </div>
           </form>
         </div>
       </div>
