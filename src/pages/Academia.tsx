@@ -65,13 +65,6 @@ const Academia = () => {
     }
   ];
 
-  const categories = ["Todos", "Básico", "Configuração", "Gestão", "Análise", "Avançado", "Integrações"];
-  const [selectedCategory, setSelectedCategory] = React.useState("Todos");
-
-  const filteredVideos = selectedCategory === "Todos" 
-    ? videos 
-    : videos.filter(video => video.category === selectedCategory);
-
   const handleVideoClick = (videoId: number) => {
     const video = videos.find(v => v.id === videoId);
     if (video) {
@@ -96,24 +89,10 @@ const Academia = () => {
         </div>
 
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap gap-2">
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(category)}
-              className="transition-all duration-200"
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
 
         {/* Videos Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredVideos.map((video) => (
+          {videos.map((video) => (
             <Card 
               key={video.id} 
               className="cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
