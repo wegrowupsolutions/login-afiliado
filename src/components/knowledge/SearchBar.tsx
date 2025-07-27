@@ -1,14 +1,18 @@
 
 import React from 'react';
-import { Search, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import { Search, RefreshCw, Plus, Trash2, FileText, Video, Image, Music } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface SearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onRefresh: () => void;
   onAddDocument: () => void;
+  onAddVideo: () => void;
+  onAddImage: () => void;
+  onAddAudio: () => void;
   onClearAll: () => void;
   isRefreshing: boolean;
 }
@@ -18,6 +22,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearchChange,
   onRefresh,
   onAddDocument,
+  onAddVideo,
+  onAddImage,
+  onAddAudio,
   onClearAll,
   isRefreshing
 }) => {
@@ -51,10 +58,32 @@ const SearchBar: React.FC<SearchBarProps> = ({
           Limpar Tudo
         </Button>
         
-        <Button onClick={onAddDocument}>
-          <Plus className="h-4 w-4 mr-2" />
-          Adicionar Documento
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Conteúdo
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onAddDocument}>
+              <FileText className="h-4 w-4 mr-2" />
+              Documento
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onAddVideo}>
+              <Video className="h-4 w-4 mr-2" />
+              Vídeo
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onAddImage}>
+              <Image className="h-4 w-4 mr-2" />
+              Imagem
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onAddAudio}>
+              <Music className="h-4 w-4 mr-2" />
+              Áudio
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

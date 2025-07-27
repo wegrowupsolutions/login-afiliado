@@ -12,7 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import SearchBar from '@/components/knowledge/SearchBar';
 import DocumentGrid from '@/components/knowledge/DocumentGrid';
 import AddDocumentDialog from '@/components/knowledge/AddDocumentDialog';
+import AddMediaDialog from '@/components/knowledge/AddMediaDialog';
 import { useDocuments } from '@/hooks/useDocuments';
+import { useMediaFiles } from '@/hooks/useMediaFiles';
 
 const KnowledgeManager = () => {
   const { user, signOut, isLoading: authLoading } = useAuth();
@@ -20,6 +22,8 @@ const KnowledgeManager = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDocumentOpen, setIsAddDocumentOpen] = useState(false);
+  const [isAddMediaOpen, setIsAddMediaOpen] = useState(false);
+  const [mediaType, setMediaType] = useState<'video' | 'image' | 'audio' | 'document'>('video');
   
   // Use the custom hook for document management
   const { 
@@ -32,6 +36,15 @@ const KnowledgeManager = () => {
     clearAllDocuments
   } = useDocuments();
 
+  // Use the custom hook for media files management
+  const { 
+    mediaFiles,
+    isLoading: mediaLoading,
+    addMediaFile,
+    handleDeleteMediaFile,
+    clearAllMediaFiles
+  } = useMediaFiles();
+
   // Navigate back to dashboard
   const handleBackToDashboard = () => {
     navigate('/dashboard');
@@ -40,6 +53,22 @@ const KnowledgeManager = () => {
   // Handle adding a new document
   const handleAddDocument = async (file: File, category: string) => {
     await uploadFileToWebhook(file, category);
+  };
+
+  // Handle adding new media
+  const handleAddVideo = () => {
+    setMediaType('video');
+    setIsAddMediaOpen(true);
+  };
+
+  const handleAddImage = () => {
+    setMediaType('image');
+    setIsAddMediaOpen(true);
+  };
+
+  const handleAddAudio = () => {
+    setMediaType('audio');
+    setIsAddMediaOpen(true);
   };
 
   if (isLoading || authLoading) {
@@ -94,6 +123,9 @@ const KnowledgeManager = () => {
             onSearchChange={setSearchQuery}
             onRefresh={handleRefresh}
             onAddDocument={() => setIsAddDocumentOpen(true)}
+            onAddVideo={handleAddVideo}
+            onAddImage={handleAddImage}
+            onAddAudio={handleAddAudio}
             onClearAll={clearAllDocuments}
             isRefreshing={isRefreshing}
           />
@@ -110,6 +142,14 @@ const KnowledgeManager = () => {
             isOpen={isAddDocumentOpen}
             onOpenChange={setIsAddDocumentOpen}
             onAddDocument={handleAddDocument}
+          />
+
+          {/* Add Media Dialog */}
+          <AddMediaDialog 
+            open={isAddMediaOpen}
+            onOpenChange={setIsAddMediaOpen}
+            onAddMedia={addMediaFile}
+            mediaType={mediaType}
           />
         </div>
       </main>
