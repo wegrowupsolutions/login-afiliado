@@ -1,8 +1,9 @@
 
 import React, { useEffect } from 'react';
-import { LineChart, Users, Smartphone, PawPrint } from 'lucide-react';
+import { LineChart, Users, Smartphone, PawPrint, MessageCircle } from 'lucide-react';
 import { useClientStats } from '@/hooks/useClientStats';
 import { useDashboardRealtime } from '@/hooks/useDashboardRealtime';
+import { useConversations } from '@/hooks/useConversations';
 
 // Import components
 import DashboardHeader from '@/components/metrics/DashboardHeader';
@@ -14,6 +15,7 @@ import RecentClientsTable from '@/components/metrics/RecentClientsTable';
 
 const MetricsDashboard = () => {
   const { stats, loading, refetchStats } = useClientStats();
+  const { conversations, loading: conversationsLoading } = useConversations();
   
   // Initialize real-time updates for the metrics dashboard
   useDashboardRealtime();
@@ -78,7 +80,7 @@ const MetricsDashboard = () => {
         </div>
         
         {/* Estatísticas em Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard 
             title="Total de Clientes"
             value={stats.totalClients}
@@ -107,6 +109,16 @@ const MetricsDashboard = () => {
             loading={loading}
             iconBgClass="bg-blue-100 dark:bg-blue-900/30"
             iconTextClass="text-blue-600 dark:text-blue-400"
+          />
+          
+          <StatCard 
+            title="Total de Conversas"
+            value={conversations.length}
+            icon={<MessageCircle />}
+            trend={`${conversations.length} conversas ativas`}
+            loading={conversationsLoading}
+            iconBgClass="bg-green-100 dark:bg-green-900/30"
+            iconTextClass="text-green-600 dark:text-green-400"
           />
         </div>
         
