@@ -95,44 +95,6 @@ const Academia = () => {
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Play className="h-8 w-8 text-purple-600" />
-                <div>
-                  <p className="text-2xl font-bold">{videos.length}</p>
-                  <p className="text-sm text-muted-foreground">Vídeos disponíveis</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Clock className="h-8 w-8 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold">2h 30m</p>
-                  <p className="text-sm text-muted-foreground">Duração total</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Star className="h-8 w-8 text-yellow-600" />
-                <div>
-                  <p className="text-2xl font-bold">4.9</p>
-                  <p className="text-sm text-muted-foreground">Avaliação média</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2">
