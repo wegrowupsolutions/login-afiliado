@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PawPrint } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface PetType {
@@ -20,7 +20,7 @@ const PetTypesChart: React.FC<PetTypesChartProps> = ({ data, loading = false }) 
     <Card className="dark:bg-gray-800 transition-all duration-300 hover:shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
-          <PawPrint className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+          <Users className="h-5 w-5 text-pink-600 dark:text-pink-400" />
           Tipos de Clientes
         </CardTitle>
       </CardHeader>
