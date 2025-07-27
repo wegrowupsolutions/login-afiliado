@@ -225,29 +225,79 @@
               var(--gradient-primary) border-box;
 }
 
+/* Modern Futuristic Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.02); 
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+  0%, 100% { 
+    opacity: 0.8; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05);
+  }
 }
 
 .animate-float {
-  animation: float 5s ease-in-out infinite;
+  animation: float 6s ease-in-out infinite;
 }
 
 .animate-pulse {
-  animation: pulse 3s ease-in-out infinite;
+  animation: pulse 4s ease-in-out infinite;
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+  }
+  50% { 
+    transform: translateY(-15px) scale(1.05); 
+  }
 }
 
 .animate-bounce {
-  animation: bounce 3s ease-in-out infinite;
+  animation: bounce 4s ease-in-out infinite;
+}
+
+/* Futuristic glow effects */
+.glow-text {
+  text-shadow: 0 0 10px hsla(var(--primary-turquoise), 0.5);
+}
+
+.glow-border {
+  box-shadow: 0 0 20px hsla(var(--primary-turquoise), 0.3);
+}
+
+/* Glass morphism utilities */
+.glass-morphism {
+  backdrop-filter: blur(16px) saturate(120%);
+  background: hsla(var(--background), 0.8);
+  border: 1px solid hsla(var(--border), 0.2);
+}
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent));
 }

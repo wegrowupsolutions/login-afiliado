@@ -62,6 +62,42 @@ export type Database = {
         }
         Relationships: []
       }
+      documents: {
+        Row: {
+          arquivo_url: string | null
+          conteudo: string | null
+          created_at: string | null
+          id: string
+          tags: string[] | null
+          tamanho_arquivo: number | null
+          tipo: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          arquivo_url?: string | null
+          conteudo?: string | null
+          created_at?: string | null
+          id?: string
+          tags?: string[] | null
+          tamanho_arquivo?: number | null
+          tipo?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          arquivo_url?: string | null
+          conteudo?: string | null
+          created_at?: string | null
+          id?: string
+          tags?: string[] | null
+          tamanho_arquivo?: number | null
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       n8n_chat_histories: {
         Row: {
           created_at: string | null

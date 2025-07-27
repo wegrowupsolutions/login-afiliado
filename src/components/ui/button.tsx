@@ -10,20 +10,21 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-md hover:shadow-lg",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm hover:shadow-md transition-all duration-300",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        success: "bg-green-500 text-white hover:bg-green-600 shadow-sm shadow-green-200 dark:shadow-green-900/30",
-        warning: "bg-amber-500 text-white hover:bg-amber-600 shadow-sm shadow-amber-200 dark:shadow-amber-900/30", 
-        danger: "bg-red-500 text-white hover:bg-red-600 shadow-sm shadow-red-200 dark:shadow-red-900/30",
-        control: "bg-gradient-to-r hover:shadow-md transition-all duration-200",
-        refresh: "bg-blue-500 text-white hover:bg-blue-600 shadow-sm shadow-blue-200 dark:shadow-blue-900/30",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm hover:shadow-md",
+        ghost: "hover:bg-accent hover:text-accent-foreground transition-all duration-300",
+        link: "text-primary underline-offset-4 hover:underline transition-all duration-300",
+        success: "bg-green-500 text-white hover:bg-green-600 shadow-md shadow-green-200 dark:shadow-green-900/30 hover:-translate-y-0.5 transition-all duration-300",
+        warning: "bg-amber-500 text-white hover:bg-amber-600 shadow-md shadow-amber-200 dark:shadow-amber-900/30 hover:-translate-y-0.5 transition-all duration-300", 
+        danger: "bg-red-500 text-white hover:bg-red-600 shadow-md shadow-red-200 dark:shadow-red-900/30 hover:-translate-y-0.5 transition-all duration-300",
+        control: "bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5",
+        refresh: "bg-blue-500 text-white hover:bg-blue-600 shadow-md shadow-blue-200 dark:shadow-blue-900/30 hover:-translate-y-0.5 transition-all duration-300",
+        futuristic: "bg-gradient-to-r from-primary-turquoise to-main-teal text-white shadow-lg hover:shadow-xl hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700",
       },
       size: {
         default: "h-10 px-4 py-2",
