@@ -65,7 +65,7 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
       let bucketName = 'videos'; // default
       if (mediaType === 'image') bucketName = 'images';
       else if (mediaType === 'audio') bucketName = 'audio';
-      else if (mediaType === 'document') bucketName = 'videos'; // use videos bucket for documents for now
+      else if (mediaType === 'document') bucketName = 'documents';
       
       const { data, error } = await supabase.storage
         .from(bucketName)
