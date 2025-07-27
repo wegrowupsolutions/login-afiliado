@@ -32,7 +32,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <header className="sticky top-0 z-40 border-b border-border/40 bg-background/80 backdrop-blur-xl">
             <div className="flex h-16 items-center justify-between px-6">
               <div className="flex items-center gap-4">
-                <SidebarTrigger className="lg:hidden" />
+                <SidebarTrigger />
                 <div className="hidden md:block">
                   <h2 className="text-sm font-medium text-muted-foreground">
                     Bem-vindo de volta

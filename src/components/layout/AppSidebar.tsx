@@ -99,8 +99,8 @@ export function AppSidebar() {
       <SidebarContent className="p-0">
         {/* Logo Section */}
         <div className={cn(
-          "flex items-center px-4 py-6 border-b border-border/40",
-          collapsed ? "justify-center px-2" : "justify-between"
+          "flex items-center border-b border-border/40",
+          collapsed ? "justify-center px-2 py-4" : "justify-between px-4 py-6"
         )}>
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-xl">
@@ -115,11 +115,10 @@ export function AppSidebar() {
               </div>
             )}
           </div>
-          {!collapsed && <SidebarTrigger />}
         </div>
 
         {/* Navigation */}
-        <SidebarGroup className="px-2 py-4">
+        <SidebarGroup className={cn("py-4", collapsed ? "px-1" : "px-2")}>
           {!collapsed && (
             <SidebarGroupLabel className="text-xs font-medium text-muted-foreground px-3 mb-2">
               Navegação
@@ -134,15 +133,17 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) => cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative overflow-hidden",
+                        "flex items-center rounded-lg transition-all duration-200 group relative overflow-hidden",
                         "hover:bg-primary/5 hover:text-primary",
+                        collapsed ? "justify-center p-3 mx-1" : "gap-3 px-3 py-2.5",
                         isActive 
                           ? "bg-primary/10 text-primary border border-primary/20 shadow-sm" 
                           : "text-muted-foreground hover:text-foreground"
                       )}
+                      title={collapsed ? item.title : undefined}
                     >
                       <item.icon className={cn(
-                        "h-5 w-5 transition-all duration-200",
+                        "h-5 w-5 transition-all duration-200 flex-shrink-0",
                         isActive(item.url) ? "text-primary" : "text-muted-foreground group-hover:text-primary"
                       )} />
                       
@@ -158,8 +159,13 @@ export function AppSidebar() {
                       )}
                       
                       {/* Active indicator */}
-                      {isActive(item.url) && (
+                      {isActive(item.url) && !collapsed && (
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-l" />
+                      )}
+                      
+                      {/* Active indicator for collapsed mode */}
+                      {isActive(item.url) && collapsed && (
+                        <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-l" />
                       )}
                     </NavLink>
                   </SidebarMenuButton>
@@ -168,13 +174,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* Collapse toggle for mini mode */}
-        {collapsed && (
-          <div className="mt-auto p-2">
-            <SidebarTrigger className="w-full" />
-          </div>
-        )}
       </SidebarContent>
     </Sidebar>
   );
