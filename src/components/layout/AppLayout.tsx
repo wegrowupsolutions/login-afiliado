@@ -1,7 +1,5 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { AppSidebar } from './AppSidebar';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
@@ -23,25 +21,20 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { user, signOut } = useAuth();
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
-        
-        <div className="flex-1 flex flex-col">
-          {/* Top Header */}
-          <header className="sticky top-0 z-40 border-b border-border/40 bg-background/80 backdrop-blur-xl">
-            <div className="flex h-16 items-center justify-between px-6">
-              <div className="flex items-center gap-4">
-                <SidebarTrigger />
-                <div className="hidden md:block">
-                  <h2 className="text-sm font-medium text-muted-foreground">
-                    Bem-vindo de volta
-                  </h2>
-                  <p className="text-lg font-semibold">
-                    Dashboard Principal
-                  </p>
-                </div>
-              </div>
+    <div className="min-h-screen bg-background">
+      {/* Top Header */}
+      <header className="sticky top-0 z-40 border-b border-border/40 bg-background/80 backdrop-blur-xl">
+        <div className="flex h-16 items-center justify-between px-6">
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block">
+              <h2 className="text-sm font-medium text-muted-foreground">
+                Bem-vindo de volta
+              </h2>
+              <p className="text-lg font-semibold">
+                Dashboard Principal
+              </p>
+            </div>
+          </div>
 
               <div className="flex items-center gap-4">
                 <ThemeToggle />
@@ -77,12 +70,10 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
           </header>
 
-          {/* Main Content */}
-          <main className="flex-1 overflow-auto">
-            {children}
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto">
+        {children}
+      </main>
+    </div>
   );
 }
