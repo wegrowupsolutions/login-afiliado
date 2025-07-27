@@ -5,106 +5,134 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 210 11% 15%;
+    /* Modern Futuristic Light Theme */
+    --background: 0 0% 98%;
+    --foreground: 217 32% 17%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 11% 15%;
+    --card-foreground: 217 32% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
+    --popover-foreground: 217 32% 17%;
 
-    --primary: 174 100% 41%;
+    --primary: 174 80% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 13% 91%;
-    --secondary-foreground: 210 11% 15%;
+    --secondary: 210 40% 85%;
+    --secondary-foreground: 217 32% 17%;
 
-    --muted: 220 13% 91%;
+    --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 174 100% 29%;
+    --accent: 174 72% 35%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 174 100% 41%;
+    --border: 210 40% 88%;
+    --input: 210 40% 93%;
+    --ring: 174 80% 45%;
 
-    --radius: 0.5rem;
+    --radius: 12px;
 
-    --sidebar-background: 220 13% 96%;
+    --sidebar-background: 0 0% 99%;
     --sidebar-foreground: 215 16% 47%;
-    --sidebar-primary: 174 100% 41%;
+    --sidebar-primary: 174 80% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 13% 91%;
+    --sidebar-accent: 210 40% 96%;
     --sidebar-accent-foreground: 215 16% 47%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 174 100% 41%;
+    --sidebar-border: 210 40% 88%;
+    --sidebar-ring: 174 80% 45%;
     
-    /* Primary Neutral Palette */
-    --primary-turquoise: 174 100% 41%;
-    --main-teal: 174 100% 29%;
+    /* Primary Neutral Palette - Modern Futuristic */
+    --primary-turquoise: 174 80% 45%;
+    --main-teal: 174 72% 35%;
     --secondary-slate: 215 16% 47%;
-    --tertiary-dark: 210 11% 15%;
-    --quaternary-black: 0 0% 0%;
+    --tertiary-dark: 217 32% 17%;
+    --quaternary-black: 220 50% 10%;
     
-    /* Grey Scale */
-    --grey-50: 0 0% 0%;
-    --grey-100: 220 9% 46%;
-    --grey-200: 220 13% 69%;
-    --grey-300: 220 14% 78%;
-    --grey-400: 220 13% 85%;
-    --grey-500: 220 13% 91%;
-    --grey-600: 220 14% 96%;
-    --grey-700: 220 43% 98%;
-    --grey-800: 210 17% 98%;
-    --grey-900: 0 0% 99%;
+    /* Grey Scale - Refined */
+    --grey-50: 220 50% 10%;
+    --grey-100: 217 32% 20%;
+    --grey-200: 215 20% 30%;
+    --grey-300: 213 16% 40%;
+    --grey-400: 211 13% 50%;
+    --grey-500: 210 12% 60%;
+    --grey-600: 209 11% 70%;
+    --grey-700: 208 10% 80%;
+    --grey-800: 207 9% 90%;
+    --grey-900: 206 8% 95%;
     
-    /* Pet Paradise Updated Colors */
-    --petshop-blue: 210 11% 15%;
+    /* Brand Colors - Updated */
+    --petshop-blue: 174 80% 45%;
     --petshop-gold: 42 100% 50%;
+    
+    /* Futuristic Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary-turquoise)), hsl(var(--main-teal)));
+    --gradient-surface: linear-gradient(145deg, hsl(var(--background)), hsl(var(--muted)));
+    --gradient-glass: linear-gradient(145deg, hsla(var(--primary-turquoise), 0.1), hsla(var(--main-teal), 0.05));
+    
+    /* Modern Shadows */
+    --shadow-xs: 0 1px 2px 0 hsla(var(--quaternary-black), 0.05);
+    --shadow-sm: 0 1px 3px 0 hsla(var(--quaternary-black), 0.1), 0 1px 2px 0 hsla(var(--quaternary-black), 0.06);
+    --shadow-md: 0 4px 6px -1px hsla(var(--quaternary-black), 0.1), 0 2px 4px -1px hsla(var(--quaternary-black), 0.06);
+    --shadow-lg: 0 10px 15px -3px hsla(var(--quaternary-black), 0.1), 0 4px 6px -2px hsla(var(--quaternary-black), 0.05);
+    --shadow-xl: 0 20px 25px -5px hsla(var(--quaternary-black), 0.1), 0 10px 10px -5px hsla(var(--quaternary-black), 0.04);
+    --shadow-glow: 0 0 20px hsla(var(--primary-turquoise), 0.3);
   }
 
   .dark {
-    --background: 210 11% 15%;
-    --foreground: 0 0% 100%;
+    /* Modern Futuristic Dark Theme */
+    --background: 220 50% 6%;
+    --foreground: 0 0% 95%;
 
-    --card: 210 11% 20%;
-    --card-foreground: 0 0% 100%;
+    --card: 220 45% 8%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 210 11% 20%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 220 45% 8%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 174 100% 41%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 174 85% 55%;
+    --primary-foreground: 220 50% 10%;
 
-    --secondary: 220 9% 25%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 217 32% 15%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 220 9% 25%;
-    --muted-foreground: 220 13% 69%;
+    --muted: 217 32% 12%;
+    --muted-foreground: 215 16% 65%;
 
-    --accent: 174 100% 29%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 174 75% 50%;
+    --accent-foreground: 220 50% 10%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 9% 25%;
-    --input: 220 9% 25%;
-    --ring: 174 100% 41%;
+    --border: 217 32% 18%;
+    --input: 217 32% 15%;
+    --ring: 174 85% 55%;
     
-    --sidebar-background: 210 11% 10%;
-    --sidebar-foreground: 220 13% 69%;
-    --sidebar-primary: 174 100% 41%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 9% 25%;
-    --sidebar-accent-foreground: 220 13% 69%;
-    --sidebar-border: 220 9% 25%;
-    --sidebar-ring: 174 100% 41%;
+    --sidebar-background: 220 50% 4%;
+    --sidebar-foreground: 215 16% 65%;
+    --sidebar-primary: 174 85% 55%;
+    --sidebar-primary-foreground: 220 50% 10%;
+    --sidebar-accent: 217 32% 12%;
+    --sidebar-accent-foreground: 215 16% 65%;
+    --sidebar-border: 217 32% 18%;
+    --sidebar-ring: 174 85% 55%;
+    
+    /* Dark theme gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary-turquoise)), hsl(var(--main-teal)));
+    --gradient-surface: linear-gradient(145deg, hsl(var(--background)), hsl(var(--muted)));
+    --gradient-glass: linear-gradient(145deg, hsla(var(--primary-turquoise), 0.15), hsla(var(--main-teal), 0.08));
+    
+    /* Dark shadows with glow */
+    --shadow-xs: 0 1px 2px 0 hsla(0, 0%, 0%, 0.3);
+    --shadow-sm: 0 1px 3px 0 hsla(0, 0%, 0%, 0.4), 0 1px 2px 0 hsla(0, 0%, 0%, 0.2);
+    --shadow-md: 0 4px 6px -1px hsla(0, 0%, 0%, 0.4), 0 2px 4px -1px hsla(0, 0%, 0%, 0.2);
+    --shadow-lg: 0 10px 15px -3px hsla(0, 0%, 0%, 0.4), 0 4px 6px -2px hsla(0, 0%, 0%, 0.2);
+    --shadow-xl: 0 20px 25px -5px hsla(0, 0%, 0%, 0.4), 0 10px 10px -5px hsla(0, 0%, 0%, 0.2);
+    --shadow-glow: 0 0 30px hsla(var(--primary-turquoise), 0.4);
   }
 }
 
@@ -116,39 +144,85 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  html {
+    scroll-behavior: smooth;
   }
 }
 
+/* Modern Futuristic UI Components */
 .login-gradient {
-  background: linear-gradient(135deg, hsl(var(--petshop-blue)) 0%, #0f172a 100%);
+  background: var(--gradient-primary);
 }
 
 .glass-card {
-  backdrop-filter: blur(16px);
-  background-color: rgba(26, 54, 93, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  backdrop-filter: blur(20px) saturate(120%);
+  background: var(--gradient-glass);
+  border: 1px solid hsla(var(--border), 0.2);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius);
 }
 
 .glass-card:hover {
-  background-color: rgba(26, 54, 93, 0.35);
-  box-shadow: 0 12px 42px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(145deg, hsla(var(--primary-turquoise), 0.15), hsla(var(--main-teal), 0.1));
+  box-shadow: var(--shadow-xl), 0 0 40px hsla(var(--primary-turquoise), 0.25);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.modern-card {
+  background: var(--gradient-surface);
+  border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-card:hover {
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
 
 .input-focus-effect:focus {
-  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.4);
-  transition: all 0.2s ease;
+  box-shadow: 0 0 0 3px hsla(var(--primary-turquoise), 0.3);
+  border-color: hsl(var(--primary));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .button-hover-effect {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.button-hover-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, hsla(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.button-hover-effect:hover::before {
+  left: 100%;
 }
 
 .button-hover-effect:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4);
+  box-shadow: var(--shadow-glow);
+}
+
+.futuristic-border {
+  position: relative;
+  border: 2px solid transparent;
+  background: linear-gradient(hsl(var(--background)), hsl(var(--background))) padding-box,
+              var(--gradient-primary) border-box;
 }
 
 @keyframes float {
