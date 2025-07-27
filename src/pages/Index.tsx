@@ -234,19 +234,6 @@ const Index = () => {
               {isLoading ? (isSignUpMode ? "Criando conta..." : "Entrando...") : (isSignUpMode ? "Criar Conta" : "Login")}
             </button>
 
-            <div className="text-center animate-slide-up" style={{ animationDelay: '0.7s' }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUpMode(!isSignUpMode);
-                  setErrors({});
-                  setFormData({ email: '', password: '' });
-                }}
-                className="text-sm text-tech-accent hover:text-white transition-colors duration-300"
-              >
-                {isSignUpMode ? 'Já tem uma conta? Faça login' : 'Não tem uma conta? Criar conta'}
-              </button>
-            </div>
           </form>
         </div>
       </div>
