@@ -47,9 +47,9 @@ const Dashboard = () => {
       <div className="p-6 space-y-6">
         {/* Welcome Section */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard Principal</h1>
           <p className="text-muted-foreground">
-            Bem-vindo ao painel de controle do Afiliado IA
+            Painel de controle do Afiliado IA
           </p>
         </div>
 
