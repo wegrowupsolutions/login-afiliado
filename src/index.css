@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 217 32% 17%;
 
-    --primary: 174 80% 45%;
+    --primary: 174 85% 30%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 85%;
@@ -24,7 +24,7 @@
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 174 72% 35%;
+    --accent: 180 90% 25%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -46,15 +46,15 @@
     --sidebar-ring: 174 80% 45%;
     
     /* Tech Color Palette - Based on reference */
-    --tech-primary: 174 72% 56%; /* Main turquoise */
-    --tech-secondary: 174 50% 45%; /* Darker turquoise */
+    --tech-primary: 174 80% 35%; /* Main turquoise - darker for better contrast */
+    --tech-secondary: 174 85% 25%; /* Darker turquoise - even darker */
     --tech-tertiary: 220 20% 55%; /* Blue gray */
     --tech-quaternary: 220 25% 25%; /* Dark gray */
-    --tech-accent: 180 100% 70%; /* Bright cyan */
+    --tech-accent: 180 85% 45%; /* Bright cyan - darker for better contrast */
     
     /* Legacy palette for compatibility */
-    --primary-turquoise: 174 72% 56%;
-    --main-teal: 174 50% 45%;
+    --primary-turquoise: 174 80% 35%;
+    --main-teal: 174 85% 25%;
     --secondary-slate: 220 20% 55%;
     --tertiary-dark: 220 25% 25%;
     --quaternary-black: 220 25% 15%;
@@ -100,8 +100,8 @@
     --popover: 220 45% 8%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 174 85% 55%;
-    --primary-foreground: 220 50% 10%;
+    --primary: 174 85% 35%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 217 32% 15%;
     --secondary-foreground: 0 0% 90%;
@@ -109,8 +109,8 @@
     --muted: 217 32% 12%;
     --muted-foreground: 215 16% 65%;
 
-    --accent: 174 75% 50%;
-    --accent-foreground: 220 50% 10%;
+    --accent: 180 85% 30%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
