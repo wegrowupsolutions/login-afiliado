@@ -19,6 +19,9 @@ const Dashboard = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   
+  // Check if user is admin
+  const isAdmin = user?.email === 'teste@gmail.com';
+  
   // Initialize real-time updates for the dashboard
   useDashboardRealtime();
   
@@ -120,9 +123,9 @@ const Dashboard = () => {
           <KnowledgeCard />
           <ClientsCard />
           <EvolutionCard />
-          <ScheduleCard />
+          {isAdmin && <ScheduleCard />}
           <AcademiaCard />
-          <ConfigCard />
+          {isAdmin && <ConfigCard />}
         </div>
       </div>
     </AppLayout>
