@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+
 import { Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -21,7 +21,6 @@ const AddImageDialog: React.FC<AddImageDialogProps> = ({
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [category, setCategory] = useState('Imagem');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,11 +37,10 @@ const AddImageDialog: React.FC<AddImageDialogProps> = ({
     setIsLoading(true);
     
     try {
-      const success = await onAddImage(selectedFile, category);
+      const success = await onAddImage(selectedFile, 'Imagem');
       
       if (success) {
         setSelectedFile(null);
-        setCategory('Imagem');
         onOpenChange(false);
       }
     } catch (error) {
@@ -75,22 +73,6 @@ const AddImageDialog: React.FC<AddImageDialogProps> = ({
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="category">Categoria</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Imagem">Imagem</SelectItem>
-                <SelectItem value="Gráfico">Gráfico</SelectItem>
-                <SelectItem value="Diagrama">Diagrama</SelectItem>
-                <SelectItem value="Foto">Foto</SelectItem>
-                <SelectItem value="Ilustração">Ilustração</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="space-y-2">
             <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
               <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
