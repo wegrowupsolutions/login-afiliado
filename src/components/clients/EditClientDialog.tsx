@@ -91,17 +91,6 @@ const EditClientDialog = ({
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-asaasId" className="text-right">
-                ID Asaas
-              </Label>
-              <Input
-                id="edit-asaasId"
-                value={editContactData.asaasCustomerId || ''}
-                onChange={(e) => setEditContactData({...editContactData, asaasCustomerId: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-address" className="text-right">
                 Endereço
               </Label>

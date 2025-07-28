@@ -91,12 +91,6 @@ const ClientDetailSheet = ({
                 <p className="text-xs text-gray-500 dark:text-gray-400">CPF/CNPJ</p>
               </div>
               
-              <CreditCard className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm font-medium">{selectedContact.asaasCustomerId || 'Não informado'}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">ID Asaas</p>
-              </div>
-              
               <MapPin className="h-5 w-5 text-gray-500" />
               <div>
                 <p className="text-sm font-medium">{selectedContact.address || 'Não informado'}</p>

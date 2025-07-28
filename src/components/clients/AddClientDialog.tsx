@@ -97,17 +97,6 @@ const AddClientDialog = ({
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="asaasId" className="text-right">
-                ID Asaas
-              </Label>
-              <Input
-                id="asaasId"
-                value={newContact.asaasCustomerId || ''}
-                onChange={(e) => setNewContact({...newContact, asaasCustomerId: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="address" className="text-right">
                 Endereço
               </Label>
