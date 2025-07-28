@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useDashboardRealtime } from '@/hooks/useDashboardRealtime';
 import { AppLayout } from '@/components/layout/AppLayout';
 import MetricsCard from '@/components/dashboard/MetricsCard';
@@ -17,14 +18,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { TrendingUp, Users, Bot, Calendar } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
-  
-  // Check if user is admin
-  const isAdmin = user?.email === 'teste@gmail.com';
   
   // Initialize real-time updates for the dashboard
   useDashboardRealtime();
+  
+  const isLoading = authLoading || roleLoading;
   
   useEffect(() => {
     if (!isLoading && !user) {
