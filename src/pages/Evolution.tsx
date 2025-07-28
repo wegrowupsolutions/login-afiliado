@@ -32,8 +32,8 @@ const Evolution = () => {
   }, []);
   
   const checkConnectionStatus = async () => {
+    console.log('🔍 INÍCIO - Verificando status da conexão para:', instanceName);
     try {
-      console.log('Checking connection status for:', instanceName);
       const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma', {
         method: 'POST',
         headers: {
@@ -44,21 +44,25 @@ const Evolution = () => {
         }),
       });
       
-      console.log('Status check response status:', response.status);
+      console.log('📡 Status da resposta HTTP:', response.status);
+      console.log('📡 Response OK:', response.ok);
       
       if (response.ok) {
         const responseText = await response.text();
-        console.log('Connection status response text:', responseText);
+        console.log('📝 Texto da resposta completo:', responseText);
+        console.log('📝 Tipo da resposta:', typeof responseText);
+        console.log('📝 Tamanho da resposta:', responseText.length);
         
         // Se a resposta for "conectado" diretamente (texto simples)
         if (responseText.toLowerCase().includes('conectado') || responseText.toLowerCase().includes('connected')) {
-          console.log('Connection confirmed via text response - stopping interval');
+          console.log('✅ SUCESSO - Conexão confirmada via texto simples!');
           if (statusCheckIntervalRef.current !== null) {
             clearInterval(statusCheckIntervalRef.current);
             statusCheckIntervalRef.current = null;
           }
           setConfirmationStatus('confirmed');
           retryCountRef.current = 0;
+          console.log('🎉 Exibindo toast de sucesso...');
           toast({
             title: "✅ Número cadastrado com sucesso!",
             description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
@@ -72,24 +76,33 @@ const Evolution = () => {
         let responseData;
         try {
           responseData = JSON.parse(responseText);
-          console.log('Parsed response data:', responseData);
+          console.log('📋 JSON parseado com sucesso:', responseData);
+          console.log('📋 Tipo do objeto parseado:', typeof responseData);
         } catch (parseError) {
-          console.log('Not JSON response, treating as text:', responseText);
+          console.log('⚠️ Não é JSON válido, tratando como texto:', responseText);
+          console.log('⚠️ Erro de parse:', parseError.message);
           // Se não for JSON, assumir que conexão ainda não foi estabelecida
           return;
         }
         
         // Verificar diferentes formatos de resposta
         if (responseData) {
+          console.log('🔍 Verificando propriedades do objeto de resposta...');
+          console.log('🔍 responseData.respond:', responseData.respond);
+          console.log('🔍 responseData.status:', responseData.status);
+          console.log('🔍 responseData.state:', responseData.state);
+          console.log('🔍 responseData.connected:', responseData.connected);
+          
           // Formato: { respond: "positivo" }
           if (responseData.respond === "positivo" || responseData.respond === "conectado") {
-            console.log('Connection confirmed via JSON respond - stopping interval');
+            console.log('✅ SUCESSO - Conexão confirmada via JSON respond!');
             if (statusCheckIntervalRef.current !== null) {
               clearInterval(statusCheckIntervalRef.current);
               statusCheckIntervalRef.current = null;
             }
             setConfirmationStatus('confirmed');
             retryCountRef.current = 0;
+            console.log('🎉 Exibindo toast de sucesso...');
             toast({
               title: "✅ Número cadastrado com sucesso!",
               description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
@@ -101,13 +114,14 @@ const Evolution = () => {
           
           // Formato: { status: "connected" } ou similar
           if (responseData.status === "connected" || responseData.status === "conectado") {
-            console.log('Connection confirmed via JSON status - stopping interval');
+            console.log('✅ SUCESSO - Conexão confirmada via JSON status!');
             if (statusCheckIntervalRef.current !== null) {
               clearInterval(statusCheckIntervalRef.current);
               statusCheckIntervalRef.current = null;
             }
             setConfirmationStatus('confirmed');
             retryCountRef.current = 0;
+            console.log('🎉 Exibindo toast de sucesso...');
             toast({
               title: "✅ Número cadastrado com sucesso!",
               description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
@@ -118,11 +132,11 @@ const Evolution = () => {
           }
           
           // Se chegou aqui, conexão ainda não foi estabelecida
-          console.log('Connection not yet established, response:', responseData);
+          console.log('⏳ Conexão ainda não estabelecida, resposta:', responseData);
         }
       } else {
         const errorText = await response.text();
-        console.error('Erro ao verificar status:', errorText);
+        console.error('❌ Erro HTTP ao verificar status:', response.status, errorText);
         toast({
           title: "Erro na verificação",
           description: "Não foi possível verificar o status da conexão.",
@@ -130,7 +144,7 @@ const Evolution = () => {
         });
       }
     } catch (error) {
-      console.error('Erro ao verificar status da conexão:', error);
+      console.error('💥 Erro de rede ao verificar status da conexão:', error);
       toast({
         title: "Erro de conexão",
         description: "Ocorreu um erro ao verificar o status da conexão.",
