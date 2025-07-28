@@ -52,16 +52,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
-      // Primeiro, invalidar todas as sessões anteriores do usuário
-      const { data: userData } = await supabase.auth.signInWithPassword({ email, password });
+      // Primeiro fazer login
+      const { data: userData, error: authError } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
+      
+      if (authError) {
+        setIsLoading(false);
+        return {
+          error: authError,
+          data: null
+        };
+      }
       
       if (userData.user && userData.session) {
-        // Invalidar sessões anteriores
+        // Invalidar todas as sessões anteriores deste usuário
         await supabase.rpc('invalidate_previous_sessions', { 
           user_uuid: userData.user.id 
         });
         
-        // Registrar nova sessão ativa
+        // Registrar esta nova sessão como ativa
         await supabase.from('active_sessions').insert({
           user_id: userData.user.id,
           session_id: userData.session.access_token.substring(0, 50),

@@ -17,9 +17,17 @@ export const useSessionControl = () => {
           .eq('user_id', user.id)
           .eq('is_active', true);
 
+        // Log para debug
+        console.log('Sessões ativas encontradas:', sessions?.length || 0);
+        
         // Se há mais de uma sessão ativa, deslogar
         if (sessions && sessions.length > 1) {
           console.log('Múltiplas sessões detectadas, fazendo logout...');
+          // Marcar todas as sessões como inativas antes de fazer logout
+          await supabase
+            .from('active_sessions')
+            .update({ is_active: false })
+            .eq('user_id', user.id);
           await signOut();
         }
       } catch (error) {
