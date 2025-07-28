@@ -194,6 +194,42 @@ export type Database = {
         }
         Relationships: []
       }
+      evolution_instances: {
+        Row: {
+          connected_at: string | null
+          created_at: string
+          disconnected_at: string | null
+          id: string
+          instance_name: string
+          is_connected: boolean
+          phone_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connected_at?: string | null
+          created_at?: string
+          disconnected_at?: string | null
+          id?: string
+          instance_name: string
+          is_connected?: boolean
+          phone_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connected_at?: string | null
+          created_at?: string
+          disconnected_at?: string | null
+          id?: string
+          instance_name?: string
+          is_connected?: boolean
+          phone_number?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       image_files: {
         Row: {
           category: string | null
@@ -408,6 +444,14 @@ export type Database = {
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      mark_instance_connected: {
+        Args: {
+          p_user_id: string
+          p_instance_name: string
+          p_phone_number?: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Evolution = () => {
   const navigate = useNavigate();
@@ -33,123 +34,50 @@ const Evolution = () => {
   
   const checkConnectionStatus = async () => {
     console.log('🔍 INÍCIO - Verificando status da conexão para:', instanceName);
+    
+    if (!user?.id) {
+      console.log('❌ Usuário não logado');
+      return;
+    }
+    
     try {
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          instanceName: instanceName.trim() 
-        }),
-      });
-      
-      console.log('📡 Status da resposta HTTP:', response.status);
-      console.log('📡 Response OK:', response.ok);
-      
-      if (response.ok) {
-        const responseText = await response.text();
-        console.log('📝 Texto da resposta completo:', responseText);
-        console.log('📝 Tipo da resposta:', typeof responseText);
-        console.log('📝 Tamanho da resposta:', responseText.length);
-        
-        // Se a resposta for "conectado" diretamente (texto simples)
-        if (responseText.toLowerCase().includes('conectado') || responseText.toLowerCase().includes('connected')) {
-          console.log('✅ SUCESSO - Conexão confirmada via texto simples!');
-          if (statusCheckIntervalRef.current !== null) {
-            clearInterval(statusCheckIntervalRef.current);
-            statusCheckIntervalRef.current = null;
-          }
-          setConfirmationStatus('confirmed');
-          retryCountRef.current = 0;
-          console.log('🎉 Exibindo toast de sucesso...');
-          toast({
-            title: "✅ Número cadastrado com sucesso!",
-            description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
-            variant: "default",
-            duration: 5000
-          });
-          return;
-        }
-        
-        // Tentar parsing JSON
-        let responseData;
-        try {
-          responseData = JSON.parse(responseText);
-          console.log('📋 JSON parseado com sucesso:', responseData);
-          console.log('📋 Tipo do objeto parseado:', typeof responseData);
-        } catch (parseError) {
-          console.log('⚠️ Não é JSON válido, tratando como texto:', responseText);
-          console.log('⚠️ Erro de parse:', parseError.message);
-          // Se não for JSON, assumir que conexão ainda não foi estabelecida
-          return;
-        }
-        
-        // Verificar diferentes formatos de resposta
-        if (responseData) {
-          console.log('🔍 Verificando propriedades do objeto de resposta...');
-          console.log('🔍 responseData.respond:', responseData.respond);
-          console.log('🔍 responseData.status:', responseData.status);
-          console.log('🔍 responseData.state:', responseData.state);
-          console.log('🔍 responseData.connected:', responseData.connected);
-          
-          // Formato: { respond: "positivo" }
-          if (responseData.respond === "positivo" || responseData.respond === "conectado") {
-            console.log('✅ SUCESSO - Conexão confirmada via JSON respond!');
-            if (statusCheckIntervalRef.current !== null) {
-              clearInterval(statusCheckIntervalRef.current);
-              statusCheckIntervalRef.current = null;
-            }
-            setConfirmationStatus('confirmed');
-            retryCountRef.current = 0;
-            console.log('🎉 Exibindo toast de sucesso...');
-            toast({
-              title: "✅ Número cadastrado com sucesso!",
-              description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
-              variant: "default",
-              duration: 5000
-            });
-            return;
-          }
-          
-          // Formato: { status: "connected" } ou similar
-          if (responseData.status === "connected" || responseData.status === "conectado") {
-            console.log('✅ SUCESSO - Conexão confirmada via JSON status!');
-            if (statusCheckIntervalRef.current !== null) {
-              clearInterval(statusCheckIntervalRef.current);
-              statusCheckIntervalRef.current = null;
-            }
-            setConfirmationStatus('confirmed');
-            retryCountRef.current = 0;
-            console.log('🎉 Exibindo toast de sucesso...');
-            toast({
-              title: "✅ Número cadastrado com sucesso!",
-              description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
-              variant: "default",
-              duration: 5000
-            });
-            return;
-          }
-          
-          // Se chegou aqui, conexão ainda não foi estabelecida
-          console.log('⏳ Conexão ainda não estabelecida, resposta:', responseData);
-        }
-      } else {
-        const errorText = await response.text();
-        console.error('❌ Erro HTTP ao verificar status:', response.status, errorText);
-        toast({
-          title: "Erro na verificação",
-          description: "Não foi possível verificar o status da conexão.",
-          variant: "destructive"
-        });
+      // Verificar no banco de dados local se a instância está conectada
+      const { data, error } = await supabase
+        .from('evolution_instances')
+        .select('is_connected, connected_at, phone_number')
+        .eq('user_id', user.id)
+        .eq('instance_name', instanceName.trim())
+        .maybeSingle();
+
+      console.log('📊 Resultado da consulta:', { data, error });
+
+      if (error) {
+        console.error('❌ Erro ao consultar banco:', error);
+        return;
       }
+
+      if (data && data.is_connected) {
+        console.log('✅ SUCESSO - Instância conectada encontrada no banco!');
+        if (statusCheckIntervalRef.current !== null) {
+          clearInterval(statusCheckIntervalRef.current);
+          statusCheckIntervalRef.current = null;
+        }
+        setConfirmationStatus('confirmed');
+        retryCountRef.current = 0;
+        console.log('🎉 Exibindo toast de sucesso...');
+        toast({
+          title: "✅ Número cadastrado com sucesso!",
+          description: `Seu WhatsApp foi conectado e cadastrado na plataforma.${data.phone_number ? ` Número: ${data.phone_number}` : ''}`,
+          variant: "default",
+          duration: 5000
+        });
+        return;
+      }
+
+      console.log('⏳ Instância ainda não conectada no banco de dados');
+      
     } catch (error) {
-      console.error('💥 Erro de rede ao verificar status da conexão:', error);
-      toast({
-        title: "Erro de conexão",
-        description: "Ocorreu um erro ao verificar o status da conexão.",
-        variant: "destructive"
-      });
+      console.error('💥 Erro ao verificar status no banco:', error);
     }
   };
   
@@ -236,7 +164,9 @@ const Evolution = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          instanceName: instanceName.trim() 
+          instanceName: instanceName.trim(),
+          userId: user?.id, // Enviar o ID do usuário para o webhook
+          callbackUrl: `https://ufcarzzouvxgqljqxdnc.supabase.co/functions/v1/mark-evolution-connected`
         }),
       });
       
