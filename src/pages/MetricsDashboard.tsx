@@ -96,7 +96,7 @@ const MetricsDashboard = () => {
         {/* Estatísticas em Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard 
-            title="Total de Clientes"
+            title="Total de Leads"
             value={stats.totalClients}
             icon={<Users />}
             trend={`Aumento de ${Math.round((stats.newClientsThisMonth / (stats.totalClients - stats.newClientsThisMonth || 1)) * 100)}% este mês`}
