@@ -60,9 +60,10 @@ const Evolution = () => {
           setConfirmationStatus('confirmed');
           retryCountRef.current = 0;
           toast({
-            title: "Conexão estabelecida!",
-            description: "Seu WhatsApp foi conectado com sucesso.",
-            variant: "default" 
+            title: "✅ Número cadastrado com sucesso!",
+            description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
+            variant: "default",
+            duration: 5000
           });
           return;
         }
@@ -90,9 +91,10 @@ const Evolution = () => {
             setConfirmationStatus('confirmed');
             retryCountRef.current = 0;
             toast({
-              title: "Conexão estabelecida!",
-              description: "Seu WhatsApp foi conectado com sucesso.",
-              variant: "default" 
+              title: "✅ Número cadastrado com sucesso!",
+              description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
+              variant: "default",
+              duration: 5000
             });
             return;
           }
@@ -107,9 +109,10 @@ const Evolution = () => {
             setConfirmationStatus('confirmed');
             retryCountRef.current = 0;
             toast({
-              title: "Conexão estabelecida!",
-              description: "Seu WhatsApp foi conectado com sucesso.",
-              variant: "default" 
+              title: "✅ Número cadastrado com sucesso!",
+              description: "Seu WhatsApp foi conectado e cadastrado na plataforma.",
+              variant: "default",
+              duration: 5000
             });
             return;
           }
