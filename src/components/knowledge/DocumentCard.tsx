@@ -18,21 +18,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-
-interface Document {
-  id: number;
-  name: string;
-  type: string;
-  size: string;
-  uploadedAt: string;
-  category: string;
-  titulo?: string | null;
-  metadata?: Record<string, any> | null;
-}
+import { Document } from '@/hooks/useDocuments';
 
 interface DocumentCardProps {
   document: Document;
-  onDelete: (id: number, title: string) => void;
+  onDelete: (id: string | number, title: string) => void;
 }
 
 const DocumentCard: React.FC<DocumentCardProps> = ({ document, onDelete }) => {

@@ -2,22 +2,12 @@
 import React from 'react';
 import { Database } from 'lucide-react';
 import DocumentCard from './DocumentCard';
-
-interface Document {
-  id: number;
-  name: string;
-  type: string;
-  size: string;
-  uploadedAt: string;
-  category: string;
-  titulo?: string | null;
-  metadata?: Record<string, any> | null;
-}
+import { Document } from '@/hooks/useDocuments';
 
 interface DocumentGridProps {
   documents: Document[];
   searchQuery: string;
-  onDeleteDocument: (id: number, title: string) => void;
+  onDeleteDocument: (id: string | number, title: string) => void;
 }
 
 const DocumentGrid: React.FC<DocumentGridProps> = ({ 

@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 // Document type definition
 export interface Document {
-  id: number;
+  id: string | number;
   name: string;
   type: string;
   size: string;
@@ -32,10 +32,10 @@ export const useDocuments = () => {
   const fetchDocuments = async () => {
     try {
       setIsLoading(true);
-      // Only select titulo column
+      // Select all relevant columns from the documents table
       const { data, error } = await supabase
         .from('documents')
-        .select('titulo');
+        .select('id, titulo, arquivo_url, tamanho_arquivo, tipo, created_at');
 
       if (error) {
         console.error('Error fetching documents:', error);
@@ -48,26 +48,20 @@ export const useDocuments = () => {
       }
 
       // Transform the data to match our Document interface
-      const formattedDocs: Document[] = data.map((doc, index) => {
-        // Use titulo from the database if available, otherwise generate a name
-        const documentName = doc.titulo || `Documento ${index + 1}`;
-        
-        // Create dummy data for other required fields since we don't have metadata
+      const formattedDocs: Document[] = data.map((doc) => {
         return {
-          id: index + 1, // Generate dummy id
-          name: documentName,
-          type: 'unknown',
-          size: 'Unknown',
-          category: 'Sem categoria',
-          uploadedAt: new Date().toISOString().split('T')[0],
+          id: doc.id as any, // Use the actual UUID as string
+          name: doc.titulo,
+          type: doc.tipo || 'documento',
+          size: doc.tamanho_arquivo ? `${(doc.tamanho_arquivo / 1024).toFixed(1)} KB` : 'Desconhecido',
+          category: 'Documento',
+          uploadedAt: new Date(doc.created_at).toISOString().split('T')[0],
           titulo: doc.titulo,
+          metadata: { url: doc.arquivo_url },
         };
       });
 
-      // Filter out duplicates based on the titulo field
-      const uniqueDocs = filterUniqueByTitle(formattedDocs);
-      
-      setDocuments(uniqueDocs);
+      setDocuments(formattedDocs);
     } catch (err) {
       console.error('Unexpected error fetching documents:', err);
       toast({
@@ -104,27 +98,38 @@ export const useDocuments = () => {
     });
   };
 
-  // Delete document - Updated to call the webhook with the title
-  const handleDeleteDocument = async (id: number, title: string) => {
+  // Delete document - Updated to use Supabase
+  const handleDeleteDocument = async (id: string | number, title: string) => {
     try {
-      // Call webhook to delete file from RAG system
-      console.log('Enviando solicitação para excluir arquivo:', title);
+      console.log('Excluindo documento:', title, 'ID:', id);
       
-      const response = await fetch('https://webhook.n8nlabz.com.br/webhook/excluir-arquivo-rag', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          titulo: title 
-        }),
-      });
+      // Delete from Supabase database
+      const { error: deleteError } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', String(id));
 
-      if (!response.ok) {
-        throw new Error(`Erro ao excluir o arquivo: ${response.statusText}`);
+      if (deleteError) {
+        throw new Error(`Erro ao excluir o documento: ${deleteError.message}`);
       }
 
-      // Only remove from UI if webhook call was successful
+      // Try to call webhook as well (optional)
+      try {
+        await fetch('https://webhook.n8nlabz.com.br/webhook/excluir-arquivo-rag', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            titulo: title 
+          }),
+        });
+        console.log('Webhook de exclusão chamado com sucesso');
+      } catch (webhookError) {
+        console.warn('Webhook de exclusão falhou, mas documento foi removido localmente:', webhookError);
+      }
+
+      // Remove from UI
       setDocuments(documents.filter(doc => doc.id !== id));
       
       toast({
@@ -133,10 +138,10 @@ export const useDocuments = () => {
         variant: "destructive",
       });
     } catch (err) {
-      console.error('Unexpected error deleting document:', err);
+      console.error('Erro ao excluir documento:', err);
       toast({
         title: "Erro inesperado",
-        description: "Não foi possível excluir o documento.",
+        description: err instanceof Error ? err.message : "Não foi possível excluir o documento.",
         variant: "destructive",
       });
     }
@@ -205,13 +210,10 @@ export const useDocuments = () => {
         .from('documents')
         .insert({
           titulo: file.name,
-          filename: fileName,
-          original_name: file.name,
-          file_size: file.size,
-          mime_type: file.type,
-          category: category,
-          file_url: publicUrl,
-          created_at: new Date().toISOString()
+          arquivo_url: publicUrl,
+          tamanho_arquivo: file.size,
+          tipo: file.type,
+          user_id: (await supabase.auth.getUser()).data.user?.id
         })
         .select()
         .single();
