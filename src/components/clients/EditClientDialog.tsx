@@ -112,46 +112,6 @@ const EditClientDialog = ({
                 className="col-span-3"
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-petName" className="text-right">
-                Nome do Pet
-              </Label>
-              <Input
-                id="edit-petName"
-                value={editContactData.petName || ''}
-                onChange={(e) => setEditContactData({...editContactData, petName: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-petBreed" className="text-right">
-                Raça do Pet
-              </Label>
-              <Input
-                id="edit-petBreed"
-                value={editContactData.petBreed || ''}
-                onChange={(e) => setEditContactData({...editContactData, petBreed: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-petSize" className="text-right">
-                Porte do Pet
-              </Label>
-              <Select
-                value={editContactData.petSize || ''}
-                onValueChange={(value) => setEditContactData({...editContactData, petSize: value})}
-              >
-                <SelectTrigger id="edit-petSize" className="col-span-3">
-                  <SelectValue placeholder="Selecione o porte" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pequeno">Pequeno</SelectItem>
-                  <SelectItem value="medio">Médio</SelectItem>
-                  <SelectItem value="grande">Grande</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
           <div className="grid grid-cols-4 items-start gap-4">
             <Label htmlFor="edit-notes" className="text-right mt-2">

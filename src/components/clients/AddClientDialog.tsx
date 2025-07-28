@@ -118,46 +118,6 @@ const AddClientDialog = ({
                 className="col-span-3"
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="petName" className="text-right">
-                Nome do Pet
-              </Label>
-              <Input
-                id="petName"
-                value={newContact.petName || ''}
-                onChange={(e) => setNewContact({...newContact, petName: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="petBreed" className="text-right">
-                Raça do Pet
-              </Label>
-              <Input
-                id="petBreed"
-                value={newContact.petBreed || ''}
-                onChange={(e) => setNewContact({...newContact, petBreed: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="petSize" className="text-right">
-                Porte do Pet
-              </Label>
-              <Select
-                value={newContact.petSize || ''}
-                onValueChange={(value) => setNewContact({...newContact, petSize: value})}
-              >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Selecione o porte" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pequeno">Pequeno</SelectItem>
-                  <SelectItem value="medio">Médio</SelectItem>
-                  <SelectItem value="grande">Grande</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
           <div className="grid grid-cols-4 items-start gap-4">
             <Label htmlFor="notes" className="text-right mt-2">
