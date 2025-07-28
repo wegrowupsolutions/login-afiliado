@@ -43,7 +43,7 @@ const Evolution = () => {
     try {
       // PRIMEIRA TENTATIVA: Verificar diretamente no Evolution via webhook
       console.log('🔍 Verificando status no Evolution...');
-      const evolutionResponse = await fetch('https://webhook.serverwegrowup.com.br/webhook/verificar-status-instancia', {
+      const evolutionResponse = await fetch('https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
