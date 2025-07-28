@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -121,16 +123,102 @@ const AgentConfig = () => {
       form.setValue('promotionLinks', newLinks);
     }
   };
+  const generatePromptText = (data: FormData): string => {
+    return `Haja como um especialista em engenharia de prompts com base na técnica COT (Chain of Thought) e me ajude a criar um prompt de engenharia seguindo o framework abaixo:
+
+## 1. CONTEXTO
+[Descreva aqui o cenário específico e objetivo do prompt]
+- Qual é o problema que precisa ser resolvido?
+${data.context.problem}
+
+- Qual é o resultado esperado?
+${data.context.expectedResult}
+
+- Quem é o público-alvo?
+${data.context.targetAudience}
+
+- Em qual ambiente/situação será utilizado?
+${data.context.environment}
+
+Cenário específico: ${data.context.scenario}
+
+## 2. PERSONALIDADE
+[Defina o comportamento e características do agente]
+- Tom de voz: ${data.personality.toneOfVoice}
+- Nível de linguagem: ${data.personality.languageLevel}
+- Características de personalidade específicas:
+${data.personality.characteristics}
+- Conhecimentos específicos necessários:
+${data.personality.specificKnowledge}
+
+## 3. DIRETRIZES
+[Liste as regras e restrições do negócio]
+- Políticas importantes:
+${data.guidelines.policies}
+- Limites de atuação:
+${data.guidelines.actionLimits}
+- Restrições legais ou éticas:
+${data.guidelines.restrictions}
+- Procedimentos obrigatórios:
+${data.guidelines.procedures}
+${data.guidelines.confidentialInfo ? `- Informações confidenciais ou sensíveis:\n${data.guidelines.confidentialInfo}` : ''}
+
+## 4. ESTRUTURA DA CONVERSA
+[Detalhe o passo a passo do raciocínio]
+${data.conversationStructure}
+
+## 5. FAQ
+[Liste as perguntas frequentes e suas respostas]
+${data.faq}
+
+## 6. EXEMPLOS DE USO
+[Forneça exemplos práticos de interações]
+${data.usageExamples}
+
+## 7. MÉTRICAS DE SUCESSO
+[Defina como medir o sucesso do prompt]
+- Indicadores de qualidade:
+${data.successMetrics.qualityIndicators}
+- Métricas de desempenho:
+${data.successMetrics.performanceMetrics}
+- Critérios de avaliação:
+${data.successMetrics.evaluationCriteria}
+
+## INFORMAÇÕES ADICIONAIS
+- Nome do produto: ${data.productName}
+- Links de divulgação:
+${data.promotionLinks.filter(link => link.trim().length > 0).map((link, index) => `  ${index + 1}. ${link}`).join('\n')}
+
+---
+Com base nas informações acima, gere um prompt completo que atenda aos requisitos especificados. Gere no formato markdown.`;
+  };
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      // Simular salvamento - implementar API aqui
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const { data: { user } } = await supabase.auth.getUser();
       
-      console.log('Configuração do agente:', data);
+      if (!user) {
+        toast.error('Usuário não autenticado');
+        return;
+      }
+
+      const promptText = generatePromptText(data);
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({ prompt: promptText })
+        .eq('id', user.id);
+
+      if (error) {
+        throw error;
+      }
+      
+      console.log('Configuração do agente salva:', data);
       toast.success('Configuração do agente salva com sucesso!');
       navigate('/dashboard');
     } catch (error) {
+      console.error('Erro ao salvar:', error);
       toast.error('Erro ao salvar configuração. Tente novamente.');
     } finally {
       setIsSubmitting(false);
