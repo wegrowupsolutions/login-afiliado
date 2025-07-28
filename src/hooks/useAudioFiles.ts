@@ -33,9 +33,23 @@ export const useAudioFiles = () => {
   const fetchAudioFiles = async () => {
     try {
       setIsLoading(true);
+      
+      // Get current user first
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('User not authenticated:', userError);
+        toast({
+          title: "Erro de autenticação",
+          description: "Faça login para ver seus áudios.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('audio_files')
         .select('*')
+        .eq('user_id', user.id) // Explicit filter by user ID
         .order('created_at', { ascending: false });
 
       if (error) {

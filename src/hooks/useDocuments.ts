@@ -34,10 +34,25 @@ export const useDocuments = () => {
   const fetchDocuments = async () => {
     try {
       setIsLoading(true);
-      // Select all relevant columns from the documents table
+      
+      // Get current user first
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('User not authenticated:', userError);
+        toast({
+          title: "Erro de autenticação",
+          description: "Faça login para ver seus documentos.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Select all relevant columns from the documents table with explicit user filter
       const { data, error } = await supabase
         .from('documents')
-        .select('id, titulo, arquivo_url, tamanho_arquivo, tipo, created_at');
+        .select('id, titulo, arquivo_url, tamanho_arquivo, tipo, created_at')
+        .eq('user_id', user.id) // Explicit filter by user ID
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching documents:', error);
