@@ -1,0 +1,245 @@
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+export interface AudioFile {
+  id: string;
+  user_id: string;
+  title: string;
+  description?: string;
+  file_url: string;
+  file_size?: number;
+  duration?: number;
+  bitrate?: number;
+  sample_rate?: number;
+  channels?: number;
+  thumbnail_url?: string;
+  category: string;
+  tags?: string[];
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export const useAudioFiles = () => {
+  const { toast } = useToast();
+  const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Fetch audio files from Supabase
+  const fetchAudioFiles = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('audio_files')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching audio files:', error);
+        toast({
+          title: "Erro ao carregar áudios",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAudioFiles((data || []) as AudioFile[]);
+    } catch (err) {
+      console.error('Unexpected error fetching audio files:', err);
+      toast({
+        title: "Erro inesperado",
+        description: "Não foi possível carregar os áudios.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    fetchAudioFiles();
+    toast({
+      title: "Atualizando áudios",
+      description: "Os áudios estão sendo atualizados do banco de dados.",
+    });
+  };
+
+  // Upload audio file to Supabase Storage and save metadata
+  const uploadAudioFile = async (file: File, category: string) => {
+    try {
+      console.log('Iniciando upload do áudio:', file.name, 'categoria:', category);
+      
+      // Get current user FIRST
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error('Erro ao obter usuário:', userError);
+        throw new Error(`Erro de autenticação: ${userError.message}`);
+      }
+      
+      if (!user) {
+        console.error('Usuário não encontrado');
+        throw new Error('Usuário não autenticado. Faça login novamente.');
+      }
+
+      console.log('Usuário autenticado:', user.id);
+      
+      // Generate unique filename with user folder structure
+      const timestamp = Date.now();
+      const fileName = `${user.id}/${timestamp}_${file.name}`;
+      
+      console.log('Fazendo upload para o Storage:', fileName);
+      
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('audio')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error('Erro no upload para Storage:', uploadError);
+        throw new Error(`Erro ao fazer upload: ${uploadError.message}`);
+      }
+
+      console.log('Upload para Storage concluído:', uploadData);
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('audio')
+        .getPublicUrl(fileName);
+
+      console.log('URL pública gerada:', publicUrl);
+
+      // Save audio metadata to database
+      const insertData = {
+        title: file.name,
+        file_url: publicUrl,
+        file_size: file.size,
+        category: category,
+        user_id: user.id
+      };
+
+      console.log('Dados para inserir no banco:', insertData);
+
+      const { data: audioData, error: audioError } = await supabase
+        .from('audio_files')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (audioError) {
+        console.error('Erro ao inserir no banco:', audioError);
+        // If database insert fails, clean up the uploaded file
+        await supabase.storage.from('audio').remove([fileName]);
+        throw new Error(`Erro ao salvar no banco: ${audioError.message}`);
+      }
+
+      console.log('Áudio salvo no banco com sucesso:', audioData);
+      
+      // Refresh the audio list
+      await fetchAudioFiles();
+      
+      toast({
+        title: "Áudio adicionado",
+        description: `${file.name} foi adicionado com sucesso!`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Erro ao enviar o áudio:', error);
+      
+      toast({
+        title: "Erro ao enviar áudio",
+        description: error instanceof Error ? error.message : "Não foi possível enviar o áudio.",
+        variant: "destructive",
+      });
+      
+      return false;
+    }
+  };
+
+  // Delete audio file
+  const handleDeleteAudioFile = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('audio_files')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting audio file:', error);
+        toast({
+          title: "Erro ao excluir áudio",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAudioFiles(audioFiles.filter(file => file.id !== id));
+      
+      toast({
+        title: "Áudio excluído",
+        description: "O áudio foi removido com sucesso!",
+        variant: "destructive",
+      });
+    } catch (err) {
+      console.error('Unexpected error deleting audio file:', err);
+      toast({
+        title: "Erro inesperado",
+        description: "Não foi possível excluir o áudio.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Clear all audio files
+  const clearAllAudioFiles = async () => {
+    try {
+      const { error } = await supabase
+        .from('audio_files')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows
+
+      if (error) {
+        throw new Error(`Erro ao limpar áudios: ${error.message}`);
+      }
+
+      setAudioFiles([]);
+      
+      toast({
+        title: "Áudios limpos",
+        description: "Todos os áudios foram removidos com sucesso!",
+        variant: "destructive",
+      });
+    } catch (err) {
+      console.error('Unexpected error clearing audio files:', err);
+      toast({
+        title: "Erro inesperado",
+        description: "Não foi possível limpar os áudios.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Load audio files on hook initialization
+  useEffect(() => {
+    fetchAudioFiles();
+  }, []);
+
+  return {
+    audioFiles,
+    isLoading,
+    isRefreshing,
+    fetchAudioFiles,
+    handleRefresh,
+    uploadAudioFile,
+    handleDeleteAudioFile,
+    clearAllAudioFiles
+  };
+};

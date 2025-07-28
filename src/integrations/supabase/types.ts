@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      audio_files: {
+        Row: {
+          bitrate: number | null
+          category: string | null
+          channels: number | null
+          created_at: string
+          description: string | null
+          duration: number | null
+          file_size: number | null
+          file_url: string
+          id: string
+          metadata: Json | null
+          sample_rate: number | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bitrate?: number | null
+          category?: string | null
+          channels?: number | null
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          file_size?: number | null
+          file_url: string
+          id?: string
+          metadata?: Json | null
+          sample_rate?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bitrate?: number | null
+          category?: string | null
+          channels?: number | null
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          metadata?: Json | null
+          sample_rate?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       dados_cliente: {
         Row: {
           asaas_customer_id: string | null

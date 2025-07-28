@@ -14,9 +14,11 @@ import DocumentGrid from '@/components/knowledge/DocumentGrid';
 import AddDocumentDialog from '@/components/knowledge/AddDocumentDialog';
 import AddMediaDialog from '@/components/knowledge/AddMediaDialog';
 import AddImageDialog from '@/components/knowledge/AddImageDialog';
+import AddAudioDialog from '@/components/knowledge/AddAudioDialog';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useMediaFiles } from '@/hooks/useMediaFiles';
 import { useImageFiles } from '@/hooks/useImageFiles';
+import { useAudioFiles } from '@/hooks/useAudioFiles';
 
 const KnowledgeManager = () => {
   const { user, signOut, isLoading: authLoading } = useAuth();
@@ -26,7 +28,8 @@ const KnowledgeManager = () => {
   const [isAddDocumentOpen, setIsAddDocumentOpen] = useState(false);
   const [isAddMediaOpen, setIsAddMediaOpen] = useState(false);
   const [isAddImageOpen, setIsAddImageOpen] = useState(false);
-  const [mediaType, setMediaType] = useState<'video' | 'audio' | 'document'>('video');
+  const [isAddAudioOpen, setIsAddAudioOpen] = useState(false);
+  const [mediaType, setMediaType] = useState<'video' | 'document'>('video');
   
   // Use the custom hook for document management
   const { 
@@ -57,7 +60,16 @@ const KnowledgeManager = () => {
     clearAllImageFiles
   } = useImageFiles();
 
-  // Combine documents, media files and image files into a single array
+  // Use the custom hook for audio files management
+  const { 
+    audioFiles,
+    isLoading: audioLoading,
+    uploadAudioFile,
+    handleDeleteAudioFile,
+    clearAllAudioFiles
+  } = useAudioFiles();
+
+  // Combine documents, media files, image files and audio files into a single array
   const allContent = React.useMemo(() => {
     const combinedContent = [
       ...documents,
@@ -80,10 +92,20 @@ const KnowledgeManager = () => {
         category: image.category || 'Imagem',
         titulo: image.title,
         metadata: { url: image.file_url },
+      })),
+      ...audioFiles.map(audio => ({
+        id: audio.id,
+        name: audio.title,
+        type: 'audio',
+        size: audio.file_size ? `${(audio.file_size / 1024).toFixed(1)} KB` : 'Desconhecido',
+        uploadedAt: new Date(audio.created_at).toISOString().split('T')[0],
+        category: audio.category || 'Áudio',
+        titulo: audio.title,
+        metadata: { url: audio.file_url },
       }))
     ];
     return combinedContent;
-  }, [documents, mediaFiles, imageFiles]);
+  }, [documents, mediaFiles, imageFiles, audioFiles]);
 
   // Handle unified delete function
   const handleUnifiedDelete = async (id: string | number, title: string) => {
@@ -91,11 +113,15 @@ const KnowledgeManager = () => {
     const isMediaFile = mediaFiles.some(media => media.id === id);
     // Check if it's an image file (from image_files table)
     const isImageFile = imageFiles.some(image => image.id === id);
+    // Check if it's an audio file (from audio_files table)
+    const isAudioFile = audioFiles.some(audio => audio.id === id);
     
     if (isMediaFile) {
       await handleDeleteMediaFile(id as string);
     } else if (isImageFile) {
       await handleDeleteImageFile(id as string);
+    } else if (isAudioFile) {
+      await handleDeleteAudioFile(id as string);
     } else {
       await handleDeleteDocument(id, title);
     }
@@ -122,8 +148,7 @@ const KnowledgeManager = () => {
   };
 
   const handleAddAudio = () => {
-    setMediaType('audio');
-    setIsAddMediaOpen(true);
+    setIsAddAudioOpen(true);
   };
 
   if (isLoading || authLoading) {
@@ -212,6 +237,13 @@ const KnowledgeManager = () => {
             open={isAddImageOpen}
             onOpenChange={setIsAddImageOpen}
             onAddImage={uploadImageFile}
+          />
+
+          {/* Add Audio Dialog */}
+          <AddAudioDialog 
+            open={isAddAudioOpen}
+            onOpenChange={setIsAddAudioOpen}
+            onAddAudio={uploadAudioFile}
           />
         </div>
       </main>
