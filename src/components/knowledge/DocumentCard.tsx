@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Trash2 } from 'lucide-react';
+import { FileText, Trash2, Volume2, Play, User } from 'lucide-react';
 import { 
   Card, 
   CardHeader, 
@@ -26,11 +26,31 @@ interface DocumentCardProps {
 }
 
 const DocumentCard: React.FC<DocumentCardProps> = ({ document, onDelete }) => {
+  // Function to get the appropriate icon based on file type
+  const getFileIcon = () => {
+    const type = document.type?.toLowerCase();
+    
+    if (type === 'audio' || document.category?.toLowerCase() === 'áudio') {
+      return <Volume2 className="h-5 w-5 mr-2 text-green-500" />;
+    }
+    
+    if (type === 'video' || type?.includes('video') || document.category?.toLowerCase() === 'mídia') {
+      return <Play className="h-5 w-5 mr-2 text-blue-500" />;
+    }
+    
+    if (type === 'image' || type?.includes('image') || document.category?.toLowerCase() === 'imagem') {
+      return <User className="h-5 w-5 mr-2 text-purple-500" />;
+    }
+    
+    // Default icon for documents
+    return <FileText className="h-5 w-5 mr-2 text-amber-500" />;
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <FileText className="h-5 w-5 mr-2 text-amber-500" />
+          {getFileIcon()}
           <span className="truncate">{document.name}</span>
         </CardTitle>
       </CardHeader>
