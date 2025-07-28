@@ -73,8 +73,8 @@ const Dashboard = () => {
 
         {/* Main Dashboard Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <EvolutionCard />
           <KnowledgeCard />
+          <EvolutionCard />
           <ChatsCard />
           <MetricsCard />
           <ClientsCard />
