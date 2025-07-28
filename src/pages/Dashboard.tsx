@@ -12,6 +12,7 @@ import EvolutionCard from '@/components/dashboard/EvolutionCard';
 import ScheduleCard from '@/components/dashboard/ScheduleCard';
 import ConfigCard from '@/components/dashboard/ConfigCard';
 import AcademiaCard from '@/components/dashboard/AcademiaCard';
+import AgentConfigCard from '@/components/dashboard/AgentConfigCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, Users, Bot, Calendar } from 'lucide-react';
 
@@ -78,6 +79,7 @@ const Dashboard = () => {
           <ChatsCard />
           <MetricsCard />
           <ClientsCard />
+          <AgentConfigCard />
           <AcademiaCard />
           {isAdmin && <ScheduleCard />}
           {isAdmin && <ConfigCard />}
