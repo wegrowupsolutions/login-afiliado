@@ -205,6 +205,13 @@ export const useDocuments = () => {
         .from('documents')
         .getPublicUrl(fileName);
 
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        throw new Error('Usuário não autenticado');
+      }
+
       // Save document metadata to database
       const { data: docData, error: docError } = await supabase
         .from('documents')
@@ -213,7 +220,7 @@ export const useDocuments = () => {
           arquivo_url: publicUrl,
           tamanho_arquivo: file.size,
           tipo: file.type,
-          user_id: (await supabase.auth.getUser()).data.user?.id
+          user_id: user.id
         })
         .select()
         .single();
