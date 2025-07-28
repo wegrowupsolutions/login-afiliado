@@ -58,6 +58,19 @@ const formSchema = z.object({
     performanceMetrics: z.string().min(10, 'Liste as métricas de desempenho'),
     evaluationCriteria: z.string().min(10, 'Descreva os critérios de avaliação'),
   }),
+
+  // Links de Divulgação
+  promotionLinks: z.object({
+    link1: z.string().url('Link 1 deve ser uma URL válida').min(1, 'Link 1 é obrigatório'),
+    link2: z.string().url('Deve ser uma URL válida').optional().or(z.literal('')),
+    link3: z.string().url('Deve ser uma URL válida').optional().or(z.literal('')),
+    link4: z.string().url('Deve ser uma URL válida').optional().or(z.literal('')),
+    link5: z.string().url('Deve ser uma URL válida').optional().or(z.literal('')),
+    link6: z.string().url('Deve ser uma URL válida').optional().or(z.literal('')),
+  }),
+
+  // Nome do Produto
+  productName: z.string().min(2, 'Nome do produto deve ter pelo menos 2 caracteres'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -98,6 +111,15 @@ const AgentConfig = () => {
         performanceMetrics: '',
         evaluationCriteria: '',
       },
+      promotionLinks: {
+        link1: '',
+        link2: '',
+        link3: '',
+        link4: '',
+        link5: '',
+        link6: '',
+      },
+      productName: '',
     },
   });
 
@@ -132,6 +154,8 @@ const AgentConfig = () => {
       { key: 'faq', check: (values.faq || '').length > 0 },
       { key: 'usageExamples', check: (values.usageExamples || '').length > 0 },
       { key: 'successMetrics', check: Object.values(values.successMetrics || {}).some(v => v.length > 0) },
+      { key: 'promotionLinks', check: (values.promotionLinks?.link1 || '').length > 0 },
+      { key: 'productName', check: (values.productName || '').length > 0 },
     ];
     return sections.filter(section => section.check).length;
   }, [form.watch()]);
@@ -162,7 +186,7 @@ const AgentConfig = () => {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="bg-primary/10 text-primary">
-              {completedSections}/7 seções preenchidas
+              {completedSections}/9 seções preenchidas
             </Badge>
           </div>
         </div>
@@ -178,13 +202,13 @@ const AgentConfig = () => {
                 <CardTitle className="text-lg">Progresso da Configuração</CardTitle>
               </div>
               <span className="text-sm text-muted-foreground">
-                {Math.round((completedSections / 7) * 100)}% completo
+                {Math.round((completedSections / 9) * 100)}% completo
               </span>
             </div>
             <div className="w-full bg-secondary rounded-full h-2">
               <div 
                 className="bg-gradient-to-r from-primary to-accent h-2 rounded-full transition-all duration-500"
-                style={{ width: `${(completedSections / 7) * 100}%` }}
+                style={{ width: `${(completedSections / 9) * 100}%` }}
               />
             </div>
           </CardHeader>
@@ -713,6 +737,169 @@ Exemplo 2:
                                 rows={3}
                               />
                             </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* 8. LINKS DE DIVULGAÇÃO */}
+                  <AccordionItem value="promotionLinks" className="border rounded-lg px-4">
+                    <AccordionTrigger className="hover:no-underline">
+                      <div className="flex items-center gap-3 text-left">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-sm font-semibold text-primary">8</span>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">Links de Divulgação</h3>
+                          <p className="text-sm text-muted-foreground">Links para divulgação do produto</p>
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="promotionLinks.link1"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Link 1 <span className="text-destructive">*</span></FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="https://exemplo.com"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Link principal obrigatório
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="promotionLinks.link2"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Link 2</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="https://exemplo.com"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="promotionLinks.link3"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Link 3</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="https://exemplo.com"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="promotionLinks.link4"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Link 4</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="https://exemplo.com"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="promotionLinks.link5"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Link 5</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="https://exemplo.com"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="promotionLinks.link6"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Link 6</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="https://exemplo.com"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* 9. NOME DO PRODUTO */}
+                  <AccordionItem value="productName" className="border rounded-lg px-4">
+                    <AccordionTrigger className="hover:no-underline">
+                      <div className="flex items-center gap-3 text-left">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-sm font-semibold text-primary">9</span>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">Nome do Produto</h3>
+                          <p className="text-sm text-muted-foreground">Identifique seu produto ou serviço</p>
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pt-4">
+                      <FormField
+                        control={form.control}
+                        name="productName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nome do Produto ou Serviço</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Digite o nome do seu produto ou serviço"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Nome que será usado pelo agente para se referir ao seu produto
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
