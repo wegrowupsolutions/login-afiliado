@@ -75,7 +75,7 @@ const RecentClientsTable: React.FC<RecentClientsTableProps> = ({ clients, loadin
                       <TableCell>{client.phone}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/40">
-                          {client.pets} {client.pets !== 1 ? 'pets' : 'pet'}
+                          0 produtos
                         </Badge>
                       </TableCell>
                       <TableCell>{client.lastVisit}</TableCell>
