@@ -45,6 +45,36 @@ const KnowledgeManager = () => {
     clearAllMediaFiles
   } = useMediaFiles();
 
+  // Combine documents and media files into a single array
+  const allContent = React.useMemo(() => {
+    const combinedContent = [
+      ...documents,
+      ...mediaFiles.map(media => ({
+        id: media.id,
+        name: media.title,
+        type: media.file_type,
+        size: media.file_size ? `${(media.file_size / 1024).toFixed(1)} KB` : 'Desconhecido',
+        uploadedAt: new Date(media.created_at).toISOString().split('T')[0],
+        category: media.category || 'Mídia',
+        titulo: media.title,
+        metadata: { url: media.file_url },
+      }))
+    ];
+    return combinedContent;
+  }, [documents, mediaFiles]);
+
+  // Handle unified delete function
+  const handleUnifiedDelete = async (id: string | number, title: string) => {
+    // Check if it's a media file (from media_files table)
+    const isMediaFile = mediaFiles.some(media => media.id === id);
+    
+    if (isMediaFile) {
+      await handleDeleteMediaFile(id as string);
+    } else {
+      await handleDeleteDocument(id, title);
+    }
+  };
+
   // Navigate back to dashboard
   const handleBackToDashboard = () => {
     navigate('/dashboard');
@@ -132,9 +162,9 @@ const KnowledgeManager = () => {
 
           {/* Document Grid */}
           <DocumentGrid 
-            documents={documents}
+            documents={allContent}
             searchQuery={searchQuery}
-            onDeleteDocument={handleDeleteDocument}
+            onDeleteDocument={handleUnifiedDelete}
           />
 
           {/* Add Document Dialog */}
