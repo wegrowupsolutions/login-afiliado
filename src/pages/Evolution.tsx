@@ -44,86 +44,82 @@ const Evolution = () => {
         }),
       });
       
+      console.log('Status check response status:', response.status);
+      
       if (response.ok) {
         const responseText = await response.text();
-        console.log('Connection status response:', responseText);
+        console.log('Connection status response text:', responseText);
         
-        let responseData;
-        
-        try {
-          responseData = JSON.parse(responseText);
-          console.log('Parsed response data:', responseData);
-        } catch (parseError) {
-          console.error('Error parsing response JSON:', parseError);
+        // Se a resposta for "conectado" diretamente (texto simples)
+        if (responseText.toLowerCase().includes('conectado') || responseText.toLowerCase().includes('connected')) {
+          console.log('Connection confirmed via text response - stopping interval');
+          if (statusCheckIntervalRef.current !== null) {
+            clearInterval(statusCheckIntervalRef.current);
+            statusCheckIntervalRef.current = null;
+          }
+          setConfirmationStatus('confirmed');
+          retryCountRef.current = 0;
           toast({
-            title: "Erro no formato da resposta",
-            description: "Não foi possível processar a resposta do servidor.",
-            variant: "destructive"
+            title: "Conexão estabelecida!",
+            description: "Seu WhatsApp foi conectado com sucesso.",
+            variant: "default" 
           });
           return;
         }
         
-        if (responseData && typeof responseData.respond === 'string') {
-          const status = responseData.respond;
-          console.log('Response status value:', status);
-          
-          if (status === "positivo") {
-            console.log('Connection confirmed - stopping interval');
+        // Tentar parsing JSON
+        let responseData;
+        try {
+          responseData = JSON.parse(responseText);
+          console.log('Parsed response data:', responseData);
+        } catch (parseError) {
+          console.log('Not JSON response, treating as text:', responseText);
+          // Se não for JSON, assumir que conexão ainda não foi estabelecida
+          return;
+        }
+        
+        // Verificar diferentes formatos de resposta
+        if (responseData) {
+          // Formato: { respond: "positivo" }
+          if (responseData.respond === "positivo" || responseData.respond === "conectado") {
+            console.log('Connection confirmed via JSON respond - stopping interval');
             if (statusCheckIntervalRef.current !== null) {
               clearInterval(statusCheckIntervalRef.current);
               statusCheckIntervalRef.current = null;
             }
             setConfirmationStatus('confirmed');
-            retryCountRef.current = 0; // Reset retry counter on success
+            retryCountRef.current = 0;
             toast({
               title: "Conexão estabelecida!",
               description: "Seu WhatsApp foi conectado com sucesso.",
               variant: "default" 
             });
-          } else if (status === "negativo") {
-            retryCountRef.current += 1;
-            console.log(`Connection failed - attempt ${retryCountRef.current} of ${maxRetries}`);
-            
-            if (retryCountRef.current >= maxRetries) {
-              console.log('Maximum retry attempts reached - updating QR code');
-              if (statusCheckIntervalRef.current !== null) {
-                clearInterval(statusCheckIntervalRef.current);
-                statusCheckIntervalRef.current = null;
-              }
-              setConfirmationStatus('failed');
-              retryCountRef.current = 0; // Reset retry counter
-              toast({
-                title: "Falha na conexão",
-                description: "Não foi possível conectar após várias tentativas. Obtendo novo QR code...",
-                variant: "destructive"
-              });
-              updateQrCode(); // Automatically get a new QR code
-            } else {
-              console.log(`Retrying... (${retryCountRef.current}/${maxRetries})`);
-              toast({
-                title: "Tentando novamente",
-                description: `Tentativa ${retryCountRef.current} de ${maxRetries}`,
-                variant: "default"
-              });
-            }
-          } else {
-            console.log('Unknown status value:', status);
-            toast({
-              title: "Status desconhecido",
-              description: "Recebemos uma resposta inesperada do servidor.",
-              variant: "destructive"
-            });
+            return;
           }
-        } else {
-          console.log('Response does not have a valid respond property:', responseData);
-          toast({
-            title: "Formato inesperado",
-            description: "A resposta do servidor não está no formato esperado.",
-            variant: "destructive"
-          });
+          
+          // Formato: { status: "connected" } ou similar
+          if (responseData.status === "connected" || responseData.status === "conectado") {
+            console.log('Connection confirmed via JSON status - stopping interval');
+            if (statusCheckIntervalRef.current !== null) {
+              clearInterval(statusCheckIntervalRef.current);
+              statusCheckIntervalRef.current = null;
+            }
+            setConfirmationStatus('confirmed');
+            retryCountRef.current = 0;
+            toast({
+              title: "Conexão estabelecida!",
+              description: "Seu WhatsApp foi conectado com sucesso.",
+              variant: "default" 
+            });
+            return;
+          }
+          
+          // Se chegou aqui, conexão ainda não foi estabelecida
+          console.log('Connection not yet established, response:', responseData);
         }
       } else {
-        console.error('Erro ao verificar status:', await response.text());
+        const errorText = await response.text();
+        console.error('Erro ao verificar status:', errorText);
         toast({
           title: "Erro na verificação",
           description: "Não foi possível verificar o status da conexão.",
