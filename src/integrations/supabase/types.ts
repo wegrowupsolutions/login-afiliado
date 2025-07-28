@@ -104,6 +104,57 @@ export type Database = {
         }
         Relationships: []
       }
+      image_files: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          file_size: number | null
+          file_url: string
+          height: number | null
+          id: string
+          metadata: Json | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          width: number | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: number | null
+          file_url: string
+          height?: number | null
+          id?: string
+          metadata?: Json | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          width?: number | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: number | null
+          file_url?: string
+          height?: number | null
+          id?: string
+          metadata?: Json | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       media_files: {
         Row: {
           category: string | null
