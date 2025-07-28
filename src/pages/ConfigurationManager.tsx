@@ -28,22 +28,11 @@ const defaultEndpoints = {
 };
 
 const endpointGroups = {
-  'Configuração da Agenda': [
-    { id: 'agenda', label: 'URL Base da Agenda', key: 'agenda' },
-    { id: 'agendaAdicionar', label: 'Adicionar Evento', key: 'agendaAdicionar' },
-    { id: 'agendaAlterar', label: 'Alterar Evento', key: 'agendaAlterar' },
-    { id: 'agendaExcluir', label: 'Excluir Evento', key: 'agendaExcluir' }
-  ],
   'Configuração do Bot': [
     { id: 'mensagem', label: 'Enviar Mensagem', key: 'mensagem' },
     { id: 'pausaBot', label: 'Pausar Bot', key: 'pausaBot' },
     { id: 'iniciaBot', label: 'Iniciar Bot', key: 'iniciaBot' },
     { id: 'confirma', label: 'Confirmar', key: 'confirma' }
-  ],
-  'Configuração RAG': [
-    { id: 'enviaRag', label: 'Enviar RAG', key: 'enviaRag' },
-    { id: 'excluirArquivoRag', label: 'Excluir Arquivo RAG', key: 'excluirArquivoRag' },
-    { id: 'excluirRag', label: 'Excluir RAG', key: 'excluirRag' }
   ],
   'Configuração Evolution': [
     { id: 'instanciaEvolution', label: 'Instância Evolution', key: 'instanciaEvolution' },
