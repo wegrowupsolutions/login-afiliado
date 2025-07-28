@@ -205,13 +205,36 @@ Com base nas informações acima, gere um prompt completo que atenda aos requisi
 
       const promptText = generatePromptText(data);
       
-      const { error } = await supabase
+      // Primeiro verifica se o perfil existe
+      const { data: profile } = await supabase
         .from('profiles')
-        .update({ prompt: promptText })
-        .eq('id', user.id);
+        .select('id')
+        .eq('id', user.id)
+        .single();
 
-      if (error) {
-        throw error;
+      if (!profile) {
+        // Se não existe, cria o perfil
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email,
+            prompt: promptText
+          });
+
+        if (insertError) {
+          throw insertError;
+        }
+      } else {
+        // Se existe, atualiza o prompt
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ prompt: promptText })
+          .eq('id', user.id);
+
+        if (updateError) {
+          throw updateError;
+        }
       }
       
       console.log('Configuração do agente salva:', data);
