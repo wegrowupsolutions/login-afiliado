@@ -28,11 +28,42 @@ const AddDocumentDialog: React.FC<AddDocumentDialogProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileCategory, setFileCategory] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  // Handle drag and drop events
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      setSelectedFile(files[0]);
     }
   };
 
@@ -61,19 +92,38 @@ const AddDocumentDialog: React.FC<AddDocumentDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+          <div 
+            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              isDragOver 
+                ? 'border-primary bg-primary/10' 
+                : 'border-gray-300 dark:border-gray-600'
+            }`}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <input
               type="file"
               id="file-upload"
               className="hidden"
               onChange={handleFileChange}
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
             />
             <label
               htmlFor="file-upload"
               className="flex flex-col items-center justify-center cursor-pointer"
             >
-              <FileUp className="h-10 w-10 text-gray-400 dark:text-gray-500 mb-2" />
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+              <FileUp className={`h-10 w-10 mb-2 ${
+                isDragOver 
+                  ? 'text-primary' 
+                  : 'text-gray-400 dark:text-gray-500'
+              }`} />
+              <p className={`text-sm mb-1 ${
+                isDragOver 
+                  ? 'text-primary' 
+                  : 'text-gray-500 dark:text-gray-400'
+              }`}>
                 Clique para selecionar ou arraste o arquivo aqui
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500">
