@@ -177,28 +177,69 @@ export const useDocuments = () => {
     }
   };
 
-  // Upload file to webhook
+  // Upload file to Supabase Storage and save metadata
   const uploadFileToWebhook = async (file: File, category: string) => {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('category', category);
-
-      console.log('Enviando arquivo para o webhook:', file.name, 'categoria:', category);
+      console.log('Enviando arquivo:', file.name, 'categoria:', category);
       
-      const response = await fetch('https://webhook.n8nlabz.com.br/webhook/envia_rag', {
-        method: 'POST',
-        body: formData,
-      });
+      // Generate unique filename
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${file.name}`;
+      
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('documents')
+        .upload(fileName, file);
 
-      if (!response.ok) {
-        throw new Error(`Erro ao enviar o arquivo: ${response.statusText}`);
+      if (uploadError) {
+        throw new Error(`Erro ao fazer upload: ${uploadError.message}`);
       }
 
-      const result = await response.json();
-      console.log('Arquivo enviado com sucesso:', result);
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('documents')
+        .getPublicUrl(fileName);
+
+      // Save document metadata to database
+      const { data: docData, error: docError } = await supabase
+        .from('documents')
+        .insert({
+          titulo: file.name,
+          filename: fileName,
+          original_name: file.name,
+          file_size: file.size,
+          mime_type: file.type,
+          category: category,
+          file_url: publicUrl,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (docError) {
+        // If database insert fails, clean up the uploaded file
+        await supabase.storage.from('documents').remove([fileName]);
+        throw new Error(`Erro ao salvar no banco: ${docError.message}`);
+      }
+
+      console.log('Arquivo enviado com sucesso:', docData);
       
-      // After successful upload, refresh the document list
+      // Try to send to webhook as well (optional)
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('category', category);
+        
+        await fetch('https://webhook.n8nlabz.com.br/webhook/envia_rag', {
+          method: 'POST',
+          body: formData,
+        });
+        console.log('Webhook também foi chamado com sucesso');
+      } catch (webhookError) {
+        console.warn('Webhook falhou, mas arquivo foi salvo localmente:', webhookError);
+      }
+      
+      // Refresh the document list
       await fetchDocuments();
       
       toast({
@@ -212,7 +253,7 @@ export const useDocuments = () => {
       
       toast({
         title: "Erro ao enviar documento",
-        description: "Não foi possível enviar o documento para o sistema de conhecimento.",
+        description: error instanceof Error ? error.message : "Não foi possível enviar o documento.",
         variant: "destructive",
       });
       
