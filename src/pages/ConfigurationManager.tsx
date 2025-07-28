@@ -28,10 +28,6 @@ const defaultEndpoints = {
 };
 
 const endpointGroups = {
-  'Configuração Supabase': [
-    { id: 'supabaseUrl', label: 'URL do Supabase', value: import.meta.env.VITE_SUPABASE_URL || '', readOnly: true },
-    { id: 'supabaseKey', label: 'Chave Anônima do Supabase', value: import.meta.env.VITE_SUPABASE_ANON_KEY || '', readOnly: true }
-  ],
   'Configuração da Agenda': [
     { id: 'agenda', label: 'URL Base da Agenda', key: 'agenda' },
     { id: 'agendaAdicionar', label: 'Adicionar Evento', key: 'agendaAdicionar' },
@@ -97,9 +93,8 @@ const ConfigurationManager = () => {
                     <Label htmlFor={field.id}>{field.label}</Label>
                     <Input
                       id={field.id}
-                      value={field.readOnly ? field.value : endpoints[field.key as keyof typeof endpoints]}
-                      onChange={field.readOnly ? undefined : (e) => handleEndpointChange(field.key, e.target.value)}
-                      readOnly={field.readOnly}
+                      value={endpoints[field.key as keyof typeof endpoints]}
+                      onChange={(e) => handleEndpointChange(field.key, e.target.value)}
                       className="w-full font-mono text-sm"
                     />
                   </div>
