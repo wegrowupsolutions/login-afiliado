@@ -35,7 +35,7 @@ const EvolutionCard = () => {
       </CardContent>
       <CardFooter className="bg-gray-50 dark:bg-gray-700/50 rounded-b-lg border-t dark:border-gray-700 flex justify-center py-3">
         <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800/50">
-          Conectar Evolution
+          Conectar Whatsapp
         </Badge>
       </CardFooter>
     </Card>
