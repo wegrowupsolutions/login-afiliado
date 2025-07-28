@@ -76,7 +76,7 @@ export type Database = {
           tipo: string | null
           titulo: string
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           arquivo_url?: string | null
@@ -88,7 +88,7 @@ export type Database = {
           tipo?: string | null
           titulo: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           arquivo_url?: string | null
@@ -100,7 +100,7 @@ export type Database = {
           tipo?: string | null
           titulo?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

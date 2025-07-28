@@ -185,11 +185,28 @@ export const useDocuments = () => {
   // Upload file to Supabase Storage and save metadata
   const uploadFileToWebhook = async (file: File, category: string) => {
     try {
-      console.log('Enviando arquivo:', file.name, 'categoria:', category);
+      console.log('Iniciando upload do arquivo:', file.name, 'categoria:', category);
+      
+      // Get current user FIRST
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error('Erro ao obter usuário:', userError);
+        throw new Error(`Erro de autenticação: ${userError.message}`);
+      }
+      
+      if (!user) {
+        console.error('Usuário não encontrado');
+        throw new Error('Usuário não autenticado. Faça login novamente.');
+      }
+
+      console.log('Usuário autenticado:', user.id);
       
       // Generate unique filename
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
+      
+      console.log('Fazendo upload para o Storage:', fileName);
       
       // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -197,41 +214,44 @@ export const useDocuments = () => {
         .upload(fileName, file);
 
       if (uploadError) {
+        console.error('Erro no upload para Storage:', uploadError);
         throw new Error(`Erro ao fazer upload: ${uploadError.message}`);
       }
+
+      console.log('Upload para Storage concluído:', uploadData);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('documents')
         .getPublicUrl(fileName);
 
-      // Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) {
-        throw new Error('Usuário não autenticado');
-      }
+      console.log('URL pública gerada:', publicUrl);
 
       // Save document metadata to database
+      const insertData = {
+        titulo: file.name,
+        arquivo_url: publicUrl,
+        tamanho_arquivo: file.size,
+        tipo: file.type,
+        user_id: user.id
+      };
+
+      console.log('Dados para inserir no banco:', insertData);
+
       const { data: docData, error: docError } = await supabase
         .from('documents')
-        .insert({
-          titulo: file.name,
-          arquivo_url: publicUrl,
-          tamanho_arquivo: file.size,
-          tipo: file.type,
-          user_id: user.id
-        })
+        .insert(insertData)
         .select()
         .single();
 
       if (docError) {
+        console.error('Erro ao inserir no banco:', docError);
         // If database insert fails, clean up the uploaded file
         await supabase.storage.from('documents').remove([fileName]);
         throw new Error(`Erro ao salvar no banco: ${docError.message}`);
       }
 
-      console.log('Arquivo enviado com sucesso:', docData);
+      console.log('Documento salvo no banco com sucesso:', docData);
       
       // Try to send to webhook as well (optional)
       try {
