@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserBucket } from '@/hooks/useUserBucket';
 
 export interface ImageFile {
   id: string;
@@ -21,6 +22,7 @@ export interface ImageFile {
 
 export const useImageFiles = () => {
   const { toast } = useToast();
+  const { uploadFileToUserBucket } = useUserBucket();
   const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -88,28 +90,11 @@ export const useImageFiles = () => {
 
       console.log('Usuário autenticado:', user.id);
       
-      // Generate unique filename with user folder structure
-      const timestamp = Date.now();
-      const fileName = `${user.id}/${timestamp}_${file.name}`;
-      
-      console.log('Fazendo upload para o Storage:', fileName);
-      
-      // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('images')
-        .upload(fileName, file);
-
-      if (uploadError) {
-        console.error('Erro no upload para Storage:', uploadError);
-        throw new Error(`Erro ao fazer upload: ${uploadError.message}`);
+      // Upload to user's personal bucket
+      const publicUrl = await uploadFileToUserBucket(file, 'images');
+      if (!publicUrl) {
+        throw new Error('Falha no upload para o bucket do usuário');
       }
-
-      console.log('Upload para Storage concluído:', uploadData);
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('images')
-        .getPublicUrl(fileName);
 
       console.log('URL pública gerada:', publicUrl);
 
@@ -132,8 +117,6 @@ export const useImageFiles = () => {
 
       if (imageError) {
         console.error('Erro ao inserir no banco:', imageError);
-        // If database insert fails, clean up the uploaded file
-        await supabase.storage.from('images').remove([fileName]);
         throw new Error(`Erro ao salvar no banco: ${imageError.message}`);
       }
 

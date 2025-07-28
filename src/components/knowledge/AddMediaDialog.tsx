@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Youtube, Link } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useUserBucket } from '@/hooks/useUserBucket';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AddMediaDialogProps {
@@ -32,6 +33,7 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
   mediaType
 }) => {
   const { toast } = useToast();
+  const { uploadFileToUserBucket } = useUserBucket();
   const [isLoading, setIsLoading] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'url' | 'youtube' | 'file'>('url');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -45,7 +47,7 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
     duration: ''
   });
 
-  // Handle file upload to Supabase Storage
+  // Handle file upload to Supabase Storage using user bucket
   const uploadFileToStorage = async (file: File): Promise<string | null> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -58,33 +60,23 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({
         return null;
       }
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      
-      // Choose the correct bucket based on media type
-      let bucketName = 'videos'; // default
-      if (mediaType === 'image') bucketName = 'images';
-      else if (mediaType === 'audio') bucketName = 'audio';
-      else if (mediaType === 'document') bucketName = 'documents';
-      
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .upload(fileName, file);
+      // Determine file type for bucket organization
+      let fileType: 'documents' | 'images' | 'audio' | 'videos';
+      if (mediaType === 'image') fileType = 'images';
+      else if (mediaType === 'audio') fileType = 'audio';
+      else if (mediaType === 'document') fileType = 'documents';
+      else fileType = 'videos'; // default for video
 
-      if (error) {
-        console.error('Error uploading file:', error);
+      // Upload to user's personal bucket
+      const publicUrl = await uploadFileToUserBucket(file, fileType);
+      if (!publicUrl) {
         toast({
           title: "Erro no upload",
-          description: error.message,
+          description: "Falha no upload para o bucket do usuário",
           variant: "destructive",
         });
         return null;
       }
-
-      // Get the public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(data.path);
 
       return publicUrl;
     } catch (error) {
