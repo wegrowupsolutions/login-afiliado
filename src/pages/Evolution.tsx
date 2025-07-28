@@ -41,58 +41,8 @@ const Evolution = () => {
     }
     
     try {
-      // PRIMEIRA TENTATIVA: Verificar diretamente no Evolution via webhook
-      console.log('🔍 Verificando status no Evolution...');
-      const evolutionResponse = await fetch('https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          instanceName: instanceName.trim()
-        }),
-      });
-
-      if (evolutionResponse.ok) {
-        const evolutionData = await evolutionResponse.json();
-        console.log('📊 Resposta do Evolution:', evolutionData);
-        
-        // Se a instância está conectada no Evolution
-        if (evolutionData.connected || evolutionData.status === 'connected' || evolutionData.isConnected) {
-          console.log('✅ SUCESSO - Instância conectada no Evolution!');
-          
-          // Salvar no banco de dados local
-          const phoneNumber = evolutionData.phoneNumber || evolutionData.phone_number || evolutionData.number;
-          await supabase.functions.invoke('mark-evolution-connected', {
-            body: {
-              instanceName: instanceName.trim(),
-              phoneNumber: phoneNumber,
-              userId: user.id
-            }
-          });
-          
-          if (statusCheckIntervalRef.current !== null) {
-            clearInterval(statusCheckIntervalRef.current);
-            statusCheckIntervalRef.current = null;
-          }
-          setConfirmationStatus('confirmed');
-          retryCountRef.current = 0;
-          console.log('🎉 Exibindo toast de sucesso...');
-          toast({
-            title: "✅ Número cadastrado com sucesso!",
-            description: `Seu WhatsApp foi conectado e cadastrado na plataforma.${phoneNumber ? ` Número: ${phoneNumber}` : ''}`,
-            variant: "default",
-            duration: 5000
-          });
-          return;
-        }
-        
-        console.log('⏳ Instância ainda não conectada no Evolution');
-      } else {
-        console.log('⚠️ Erro ao verificar status no Evolution, tentando banco local...');
-      }
-
-      // SEGUNDA TENTATIVA: Verificar no banco de dados local se a instância está conectada
+      // PRIMEIRA TENTATIVA: Verificar no banco de dados local se a instância está conectada
+      console.log('🔍 Verificando status no banco local...');
       const { data, error } = await supabase
         .from('evolution_instances')
         .select('is_connected, connected_at, phone_number')
@@ -125,7 +75,7 @@ const Evolution = () => {
         return;
       }
 
-      console.log('⏳ Instância ainda não conectada em nenhum local');
+      console.log('⏳ Instância ainda não conectada no banco local');
       
     } catch (error) {
       console.error('💥 Erro ao verificar status:', error);
