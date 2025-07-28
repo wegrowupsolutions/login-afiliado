@@ -27,9 +27,6 @@ export function AppLayout({ children }: AppLayoutProps) {
         <div className="flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <div className="hidden md:block">
-              <h2 className="text-sm font-medium text-muted-foreground">
-                Bem-vindo de volta
-              </h2>
               <p className="text-lg font-semibold">
                 Dashboard Principal
               </p>
