@@ -29,6 +29,7 @@ export type Database = {
           sessionid: string | null
           telefone: string | null
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           asaas_customer_id?: string | null
@@ -44,6 +45,7 @@ export type Database = {
           sessionid?: string | null
           telefone?: string | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           asaas_customer_id?: string | null
@@ -59,6 +61,7 @@ export type Database = {
           sessionid?: string | null
           telefone?: string | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -73,6 +76,7 @@ export type Database = {
           tipo: string | null
           titulo: string
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           arquivo_url?: string | null
@@ -84,6 +88,7 @@ export type Database = {
           tipo?: string | null
           titulo: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           arquivo_url?: string | null
@@ -95,6 +100,7 @@ export type Database = {
           tipo?: string | null
           titulo?: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -157,6 +163,7 @@ export type Database = {
           id: number
           message: Json | null
           session_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -165,6 +172,7 @@ export type Database = {
           id?: number
           message?: Json | null
           session_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -173,6 +181,7 @@ export type Database = {
           id?: number
           message?: Json | null
           session_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
