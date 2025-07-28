@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -21,7 +19,6 @@ const AddAudioDialog: React.FC<AddAudioDialogProps> = ({
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [category, setCategory] = useState('Áudio');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,11 +35,10 @@ const AddAudioDialog: React.FC<AddAudioDialogProps> = ({
     setIsLoading(true);
     
     try {
-      const success = await onAddAudio(selectedFile, category);
+      const success = await onAddAudio(selectedFile, 'Áudio');
       
       if (success) {
         setSelectedFile(null);
-        setCategory('Áudio');
         onOpenChange(false);
       }
     } catch (error) {
@@ -75,23 +71,6 @@ const AddAudioDialog: React.FC<AddAudioDialogProps> = ({
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="category">Categoria</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Áudio">Áudio</SelectItem>
-                <SelectItem value="Podcast">Podcast</SelectItem>
-                <SelectItem value="Música">Música</SelectItem>
-                <SelectItem value="Narração">Narração</SelectItem>
-                <SelectItem value="Apresentação">Apresentação</SelectItem>
-                <SelectItem value="Entrevista">Entrevista</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="space-y-2">
             <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
               <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
