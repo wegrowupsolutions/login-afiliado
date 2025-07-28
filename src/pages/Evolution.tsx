@@ -217,7 +217,7 @@ const Evolution = () => {
     
     try {
       console.log('Creating instance with name:', instanceName);
-      const response = await fetch('https://webhook.n8nlabz.com.br/webhook/instanciaevolution', {
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
