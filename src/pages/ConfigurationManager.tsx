@@ -128,7 +128,7 @@ const ConfigurationManager = () => {
         <Alert className="mb-6 border-amber-200 bg-amber-50">
           <Lock className="h-4 w-4" />
           <AlertDescription className="text-amber-800">
-            Apenas administradores autorizados (viniciushtx@gmail.com e rfreitasdc@gmail.com) podem modificar essas configurações.
+            Apenas administradores autorizados (viniciushtx@gmail.com, rfreitasdc@gmail.com e teste@gmail.com) podem modificar essas configurações.
             Essas configurações são globais e afetam todos os usuários da plataforma.
           </AlertDescription>
         </Alert>

@@ -50,7 +50,7 @@ export const useSystemConfigurations = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.email) {
-        const adminEmails = ['viniciushtx@gmail.com', 'rfreitasdc@gmail.com'];
+        const adminEmails = ['viniciushtx@gmail.com', 'rfreitasdc@gmail.com', 'teste@gmail.com'];
         setIsAdmin(adminEmails.includes(user.email));
       }
     } catch (error) {
