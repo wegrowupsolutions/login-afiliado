@@ -202,9 +202,9 @@ export const useDocuments = () => {
 
       console.log('Usuário autenticado:', user.id);
       
-      // Generate unique filename
+      // Generate unique filename with user folder structure
       const timestamp = Date.now();
-      const fileName = `${timestamp}_${file.name}`;
+      const fileName = `${user.id}/${timestamp}_${file.name}`;
       
       console.log('Fazendo upload para o Storage:', fileName);
       
