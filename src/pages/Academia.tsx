@@ -149,7 +149,7 @@ const Academia = () => {
         </div>
 
         {/* Call to Action */}
-        <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+        <Card className="bg-gradient-to-r from-primary to-accent text-white">
           <CardContent className="p-6 text-center">
             <div className="space-y-4">
               <div className="flex justify-center">
@@ -159,11 +159,11 @@ const Academia = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Precisa de ajuda?</h3>
-                <p className="text-purple-100">
+                <p className="text-white/80">
                   Entre em contato com nossa equipe de suporte para tirar suas dúvidas
                 </p>
               </div>
-              <Button variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100">
+              <Button variant="secondary" className="bg-white text-primary hover:bg-gray-100">
                 Falar com Suporte
               </Button>
             </div>
