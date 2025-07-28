@@ -93,7 +93,53 @@ export const useSystemConfigurations = () => {
   useEffect(() => {
     fetchConfigurations();
     checkAdminStatus();
-  }, []);
+    
+    // Setup realtime subscription for configuration changes
+    const channel = supabase
+      .channel('system-configurations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'system_configurations'
+        },
+        (payload) => {
+          console.log('🔄 Configuração atualizada em tempo real:', payload);
+          
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const newConfig = payload.new as SystemConfiguration;
+            setConfigurations(prev => ({
+              ...prev,
+              [newConfig.key]: newConfig.value
+            }));
+            
+            // Show toast notification for changes made by other users
+            supabase.auth.getUser().then(({ data: { user } }) => {
+              if (newConfig.updated_by && newConfig.updated_by !== user?.id) {
+                toast({
+                  title: "🔄 Configuração atualizada",
+                  description: `A configuração "${newConfig.key}" foi alterada por outro administrador.`,
+                  duration: 4000,
+                });
+              }
+            });
+          } else if (payload.eventType === 'DELETE') {
+            const deletedConfig = payload.old as SystemConfiguration;
+            setConfigurations(prev => {
+              const newConfigs = { ...prev };
+              delete newConfigs[deletedConfig.key];
+              return newConfigs;
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast]);
 
   return {
     configurations,

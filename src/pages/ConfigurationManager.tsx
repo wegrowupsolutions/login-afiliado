@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useSystemConfigurations } from '@/hooks/useSystemConfigurations';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Lock } from 'lucide-react';
+import { Lock, Wifi } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 
@@ -114,7 +114,13 @@ const ConfigurationManager = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Configurações do Sistema</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold">Configurações do Sistema</h1>
+          <div className="flex items-center gap-1 text-green-600 text-sm">
+            <Wifi className="h-4 w-4" />
+            <span>Sincronizado em tempo real</span>
+          </div>
+        </div>
         <Button 
           onClick={handleSave} 
           disabled={saving || !isAdmin}
