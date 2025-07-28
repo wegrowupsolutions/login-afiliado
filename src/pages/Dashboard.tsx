@@ -76,10 +76,10 @@ const Dashboard = () => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <KnowledgeCard />
           <EvolutionCard />
-          <ChatsCard />
+          <AgentConfigCard />
           <MetricsCard />
           <ClientsCard />
-          <AgentConfigCard />
+          <ChatsCard />
           <AcademiaCard />
           {isAdmin && <ScheduleCard />}
           {isAdmin && <ConfigCard />}
