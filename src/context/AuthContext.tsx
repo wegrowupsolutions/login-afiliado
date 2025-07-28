@@ -50,13 +50,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
-    const response = await supabase.auth.signInWithPassword({ email, password });
-    setIsLoading(false);
     
-    return {
-      error: response.error,
-      data: response.data.session
-    };
+    try {
+      // Primeiro, invalidar todas as sessões anteriores do usuário
+      const { data: userData } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (userData.user && userData.session) {
+        // Invalidar sessões anteriores
+        await supabase.rpc('invalidate_previous_sessions', { 
+          user_uuid: userData.user.id 
+        });
+        
+        // Registrar nova sessão ativa
+        await supabase.from('active_sessions').insert({
+          user_id: userData.user.id,
+          session_id: userData.session.access_token.substring(0, 50),
+          device_info: {
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+          },
+          ip_address: 'unknown'
+        });
+      }
+      
+      setIsLoading(false);
+      return {
+        error: null,
+        data: userData.session
+      };
+    } catch (error: any) {
+      setIsLoading(false);
+      return {
+        error: error,
+        data: null
+      };
+    }
   };
 
   const signUp = async (email: string, password: string) => {

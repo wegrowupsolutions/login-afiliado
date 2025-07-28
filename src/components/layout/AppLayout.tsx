@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useSessionControl } from '@/hooks/useSessionControl';
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +20,9 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const { user, signOut } = useAuth();
+  
+  // Ativar controle de sessão única
+  useSessionControl();
 
   return (
     <div className="min-h-screen bg-background">

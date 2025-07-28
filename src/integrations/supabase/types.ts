@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_sessions: {
+        Row: {
+          created_at: string | null
+          device_info: Json | null
+          id: string
+          ip_address: string | null
+          is_active: boolean | null
+          last_activity: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_info?: Json | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_info?: Json | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audio_files: {
         Row: {
           bitrate: number | null
@@ -325,9 +358,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_inactive_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       gerar_codigo_afiliado: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      invalidate_previous_sessions: {
+        Args: { user_uuid: string }
+        Returns: undefined
       }
     }
     Enums: {
