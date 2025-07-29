@@ -35,27 +35,25 @@ const Evolution = () => {
   const checkConnectionStatus = async () => {
     try {
       console.log('Checking connection status for:', instanceName);
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          instanceName: instanceName.trim() 
-        }),
+      const response = await supabase.functions.invoke('secure-webhook-proxy', {
+        body: {
+          url: 'https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            instanceName: instanceName.trim() 
+          })
+        }
       });
       
-      if (response.ok) {
-        const responseText = await response.text();
-        console.log('Connection status response:', responseText);
+      if (response.data && !response.error) {
+        const responseData = response.data;
+        console.log('Connection status response:', responseData);
         
-        let responseData;
-        
-        try {
-          responseData = JSON.parse(responseText);
-          console.log('Parsed response data:', responseData);
-        } catch (parseError) {
-          console.error('Error parsing response JSON:', parseError);
+        if (!responseData) {
+          console.error('No data in response');
           toast({
             title: "Erro no formato da resposta",
             description: "Não foi possível processar a resposta do servidor.",
@@ -124,10 +122,10 @@ const Evolution = () => {
           });
         }
       } else {
-        console.error('Erro ao verificar status:', await response.text());
+        console.error('Erro ao verificar status:', response.error);
         toast({
           title: "Erro na verificação",
-          description: "Não foi possível verificar o status da conexão.",
+          description: response.error?.message || "Não foi possível verificar o status da conexão.",
           variant: "destructive"
         });
       }
@@ -145,24 +143,30 @@ const Evolution = () => {
     try {
       setIsLoading(true);
       console.log('Updating QR code for instance:', instanceName);
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/atualizar-qr-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          instanceName: instanceName.trim() 
-        }),
+      const response = await supabase.functions.invoke('secure-webhook-proxy', {
+        body: {
+          url: 'https://webhook.serverwegrowup.com.br/webhook/atualizar-qr-code',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            instanceName: instanceName.trim() 
+          })
+        }
       });
       
-      console.log('QR code update response status:', response.status);
+      console.log('QR code update response:', response);
       
-      if (response.ok) {
-        const blob = await response.blob();
-        console.log('Received blob content type:', blob.type);
-        
-        const qrCodeUrl = URL.createObjectURL(blob);
-        setQrCodeData(qrCodeUrl);
+      if (response.data && !response.error) {
+        // Se a resposta é uma imagem base64, criar URL
+        if (typeof response.data === 'string' && response.data.startsWith('data:image')) {
+          setQrCodeData(response.data);
+        } else {
+          // Se é dados binários, criar blob URL
+          const qrCodeUrl = URL.createObjectURL(new Blob([response.data], { type: 'image/png' }));
+          setQrCodeData(qrCodeUrl);
+        }
         setConfirmationStatus('waiting');
         retryCountRef.current = 0; // Reset retry counter when getting new QR code
         console.log('QR code updated successfully');
@@ -181,11 +185,10 @@ const Evolution = () => {
           description: "Escaneie o novo QR code para conectar seu WhatsApp.",
         });
       } else {
-        const errorText = await response.text();
-        console.error('Falha ao atualizar QR code:', errorText);
+        console.error('Falha ao atualizar QR code:', response.error);
         toast({
           title: "Erro",
-          description: "Não foi possível atualizar o QR code. Tente novamente.",
+          description: response.error?.message || "Não foi possível atualizar o QR code. Tente novamente.",
           variant: "destructive"
         });
       }
@@ -218,24 +221,30 @@ const Evolution = () => {
     
     try {
       console.log('Creating instance with name:', instanceName);
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instanciaevolution', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          instanceName: instanceName.trim() 
-        }),
+      const response = await supabase.functions.invoke('secure-webhook-proxy', {
+        body: {
+          url: 'https://webhook.serverwegrowup.com.br/webhook/instanciaevolution',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            instanceName: instanceName.trim() 
+          })
+        }
       });
       
-      console.log('Create instance response status:', response.status);
+      console.log('Create instance response:', response);
       
-      if (response.ok) {
-        const blob = await response.blob();
-        console.log('Received blob content type:', blob.type);
-        
-        const qrCodeUrl = URL.createObjectURL(blob);
-        setQrCodeData(qrCodeUrl);
+      if (response.data && !response.error) {
+        // Se a resposta é uma imagem base64, usar diretamente
+        if (typeof response.data === 'string' && response.data.startsWith('data:image')) {
+          setQrCodeData(response.data);
+        } else {
+          // Se é dados binários, criar blob URL
+          const qrCodeUrl = URL.createObjectURL(new Blob([response.data], { type: 'image/png' }));
+          setQrCodeData(qrCodeUrl);
+        }
         setConfirmationStatus('waiting');
         
         if (statusCheckIntervalRef.current !== null) {
@@ -252,9 +261,8 @@ const Evolution = () => {
           description: "Escaneie o QR code para conectar seu WhatsApp.",
         });
       } else {
-        const errorText = await response.text();
-        console.error('Falha ao criar instância:', errorText);
-        throw new Error('Falha ao criar instância');
+        console.error('Falha ao criar instância:', response.error);
+        throw new Error(response.error?.message || 'Falha ao criar instância');
       }
     } catch (error) {
       console.error('Erro ao criar instância:', error);
