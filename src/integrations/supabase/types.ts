@@ -460,6 +460,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_admin_emails: {
+        Args: Record<PropertyKey, never>
+        Returns: string[]
+      }
       has_role: {
         Args: {
           _user_id: string
@@ -473,6 +477,10 @@ export type Database = {
       }
       is_admin: {
         Args: { _user_id: string }
+        Returns: boolean
+      }
+      is_admin_email: {
+        Args: { email_to_check: string }
         Returns: boolean
       }
       mark_instance_connected: {
