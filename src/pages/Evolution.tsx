@@ -33,101 +33,111 @@ const Evolution = () => {
   }, []);
   
   const checkConnectionStatus = async () => {
-    console.log('🔍 INÍCIO - Verificando status da conexão para:', instanceName);
-    
-    if (!user?.id) {
-      console.log('❌ Usuário não logado');
-      return;
-    }
-    
     try {
-      // PRIMEIRA TENTATIVA: Verificar no banco de dados local se a instância está conectada
-      console.log('🔍 Verificando status no banco local...');
-      const { data, error } = await supabase
-        .from('evolution_instances')
-        .select('is_connected, connected_at, phone_number')
-        .eq('user_id', user.id)
-        .eq('instance_name', instanceName.trim())
-        .maybeSingle();
-
-      console.log('📊 Resultado da consulta banco local:', { data, error });
-
-      if (error) {
-        console.error('❌ Erro ao consultar banco:', error);
-        return;
-      }
-
-      if (data && data.is_connected) {
-        console.log('✅ SUCESSO - Instância conectada encontrada no banco!');
-        if (statusCheckIntervalRef.current !== null) {
-          clearInterval(statusCheckIntervalRef.current);
-          statusCheckIntervalRef.current = null;
-        }
-        setConfirmationStatus('confirmed');
-        retryCountRef.current = 0;
-        console.log('🎉 Exibindo toast de sucesso...');
-        toast({
-          title: "✅ Número cadastrado com sucesso!",
-          description: `Seu WhatsApp foi conectado e cadastrado na plataforma.${data.phone_number ? ` Número: ${data.phone_number}` : ''}`,
-          variant: "default",
-          duration: 5000
-        });
-        return;
-      }
-
-      console.log('⏳ Instância ainda não conectada no banco local');
+      console.log('Checking connection status for:', instanceName);
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          instanceName: instanceName.trim() 
+        }),
+      });
       
-      // SEGUNDA TENTATIVA: Verificar diretamente na API Evolution se a instância está conectada
-      console.log('🔍 Verificando status diretamente na API Evolution...');
-      try {
-        const evolutionResponse = await fetch('https://webhook.serverwegrowup.com.br/webhook/verificar-status-instancia', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            instanceName: instanceName.trim() 
-          }),
-        });
-
-        if (evolutionResponse.ok) {
-          const statusData = await evolutionResponse.json();
-          console.log('📊 Resposta da API Evolution:', statusData);
+      if (response.ok) {
+        const responseText = await response.text();
+        console.log('Connection status response:', responseText);
+        
+        let responseData;
+        
+        try {
+          responseData = JSON.parse(responseText);
+          console.log('Parsed response data:', responseData);
+        } catch (parseError) {
+          console.error('Error parsing response JSON:', parseError);
+          toast({
+            title: "Erro no formato da resposta",
+            description: "Não foi possível processar a resposta do servidor.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        if (responseData && typeof responseData.respond === 'string') {
+          const status = responseData.respond;
+          console.log('Response status value:', status);
           
-          // Se a instância está conectada na API mas não no banco, registrar a conexão
-          if (statusData.connected && statusData.phoneNumber) {
-            console.log('✅ SUCESSO - Instância conectada encontrada na API Evolution!');
-            
-            // Registrar a conexão no banco
-            console.log('💾 Registrando conexão no banco...');
-            await supabase.rpc('mark_instance_connected', {
-              p_user_id: user.id,
-              p_instance_name: instanceName.trim(),
-              p_phone_number: statusData.phoneNumber
-            });
-            
+          if (status === "positivo") {
+            console.log('Connection confirmed - stopping interval');
             if (statusCheckIntervalRef.current !== null) {
               clearInterval(statusCheckIntervalRef.current);
               statusCheckIntervalRef.current = null;
             }
             setConfirmationStatus('confirmed');
-            retryCountRef.current = 0;
-            console.log('🎉 Exibindo toast de sucesso...');
+            retryCountRef.current = 0; // Reset retry counter on success
             toast({
-              title: "✅ Número cadastrado com sucesso!",
-              description: `Seu WhatsApp foi conectado e cadastrado na plataforma. Número: ${statusData.phoneNumber}`,
-              variant: "default",
-              duration: 5000
+              title: "Conexão estabelecida!",
+              description: "Seu WhatsApp foi conectado com sucesso.",
+              variant: "default" 
             });
-            return;
+          } else if (status === "negativo") {
+            retryCountRef.current += 1;
+            console.log(`Connection failed - attempt ${retryCountRef.current} of ${maxRetries}`);
+            
+            if (retryCountRef.current >= maxRetries) {
+              console.log('Maximum retry attempts reached - updating QR code');
+              if (statusCheckIntervalRef.current !== null) {
+                clearInterval(statusCheckIntervalRef.current);
+                statusCheckIntervalRef.current = null;
+              }
+              setConfirmationStatus('failed');
+              retryCountRef.current = 0; // Reset retry counter
+              toast({
+                title: "Falha na conexão",
+                description: "Não foi possível conectar após várias tentativas. Obtendo novo QR code...",
+                variant: "destructive"
+              });
+              updateQrCode(); // Automatically get a new QR code
+            } else {
+              console.log(`Retrying... (${retryCountRef.current}/${maxRetries})`);
+              toast({
+                title: "Tentando novamente",
+                description: `Tentativa ${retryCountRef.current} de ${maxRetries}`,
+                variant: "default"
+              });
+            }
+          } else {
+            console.log('Unknown status value:', status);
+            toast({
+              title: "Status desconhecido",
+              description: "Recebemos uma resposta inesperada do servidor.",
+              variant: "destructive"
+            });
           }
+        } else {
+          console.log('Response does not have a valid respond property:', responseData);
+          toast({
+            title: "Formato inesperado",
+            description: "A resposta do servidor não está no formato esperado.",
+            variant: "destructive"
+          });
         }
-      } catch (evolutionError) {
-        console.error('❌ Erro ao verificar status na API Evolution:', evolutionError);
+      } else {
+        console.error('Erro ao verificar status:', await response.text());
+        toast({
+          title: "Erro na verificação",
+          description: "Não foi possível verificar o status da conexão.",
+          variant: "destructive"
+        });
       }
-      
     } catch (error) {
-      console.error('💥 Erro ao verificar status:', error);
+      console.error('Erro ao verificar status da conexão:', error);
+      toast({
+        title: "Erro de conexão",
+        description: "Ocorreu um erro ao verificar o status da conexão.",
+        variant: "destructive"
+      });
     }
   };
   
@@ -208,15 +218,13 @@ const Evolution = () => {
     
     try {
       console.log('Creating instance with name:', instanceName);
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado', {
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instanciaevolution', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          instanceName: instanceName.trim(),
-          userId: user?.id, // Enviar o ID do usuário para o webhook
-          callbackUrl: `https://ufcarzzouvxgqljqxdnc.supabase.co/functions/v1/mark-evolution-connected`
+          instanceName: instanceName.trim() 
         }),
       });
       
@@ -293,7 +301,7 @@ const Evolution = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <Bot className="h-8 w-8 text-petshop-gold" />
-            <h1 className="text-2xl font-bold">Afiliado IA</h1>
+            <h1 className="text-2xl font-bold">Pet Paradise</h1>
           </div>
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="bg-white/10 text-white border-0 px-3 py-1">
