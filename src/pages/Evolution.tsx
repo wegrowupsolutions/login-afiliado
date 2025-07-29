@@ -37,7 +37,7 @@ const Evolution = () => {
       console.log('Checking connection status for:', instanceName);
       const response = await supabase.functions.invoke('secure-webhook-proxy', {
         body: {
-          url: 'https://webhook.n8nlabz.com.br/webhook/confirma',
+          url: 'https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
