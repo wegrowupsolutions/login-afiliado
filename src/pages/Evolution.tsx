@@ -77,6 +77,55 @@ const Evolution = () => {
 
       console.log('⏳ Instância ainda não conectada no banco local');
       
+      // SEGUNDA TENTATIVA: Verificar diretamente na API Evolution se a instância está conectada
+      console.log('🔍 Verificando status diretamente na API Evolution...');
+      try {
+        const evolutionResponse = await fetch('https://webhook.serverwegrowup.com.br/webhook/verificar-status-instancia', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            instanceName: instanceName.trim() 
+          }),
+        });
+
+        if (evolutionResponse.ok) {
+          const statusData = await evolutionResponse.json();
+          console.log('📊 Resposta da API Evolution:', statusData);
+          
+          // Se a instância está conectada na API mas não no banco, registrar a conexão
+          if (statusData.connected && statusData.phoneNumber) {
+            console.log('✅ SUCESSO - Instância conectada encontrada na API Evolution!');
+            
+            // Registrar a conexão no banco
+            console.log('💾 Registrando conexão no banco...');
+            await supabase.rpc('mark_instance_connected', {
+              p_user_id: user.id,
+              p_instance_name: instanceName.trim(),
+              p_phone_number: statusData.phoneNumber
+            });
+            
+            if (statusCheckIntervalRef.current !== null) {
+              clearInterval(statusCheckIntervalRef.current);
+              statusCheckIntervalRef.current = null;
+            }
+            setConfirmationStatus('confirmed');
+            retryCountRef.current = 0;
+            console.log('🎉 Exibindo toast de sucesso...');
+            toast({
+              title: "✅ Número cadastrado com sucesso!",
+              description: `Seu WhatsApp foi conectado e cadastrado na plataforma. Número: ${statusData.phoneNumber}`,
+              variant: "default",
+              duration: 5000
+            });
+            return;
+          }
+        }
+      } catch (evolutionError) {
+        console.error('❌ Erro ao verificar status na API Evolution:', evolutionError);
+      }
+      
     } catch (error) {
       console.error('💥 Erro ao verificar status:', error);
     }
