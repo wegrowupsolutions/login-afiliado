@@ -64,7 +64,7 @@ const Evolution = () => {
           return;
         }
         
-        if (responseData && typeof responseData.respond === 'string') {
+        if (responseData && responseData.respond) {
           const status = responseData.respond;
           console.log('Response status value:', status);
           
