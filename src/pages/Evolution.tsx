@@ -37,7 +37,7 @@ const Evolution = () => {
       console.log('Checking connection status for:', instanceName);
       const response = await supabase.functions.invoke('secure-webhook-proxy', {
         body: {
-          url: 'https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado',
+          url: 'https://webhook.n8nlabz.com.br/webhook/confirma',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -49,11 +49,16 @@ const Evolution = () => {
       });
       
       if (response.data && !response.error) {
-        const responseData = response.data;
-        console.log('Connection status response:', responseData);
+        const responseText = JSON.stringify(response.data);
+        console.log('Connection status response:', responseText);
         
-        if (!responseData) {
-          console.error('No data in response');
+        let responseData;
+        
+        try {
+          responseData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+          console.log('Parsed response data:', responseData);
+        } catch (parseError) {
+          console.error('Error parsing response JSON:', parseError);
           toast({
             title: "Erro no formato da resposta",
             description: "Não foi possível processar a resposta do servidor.",
@@ -62,7 +67,7 @@ const Evolution = () => {
           return;
         }
         
-        if (responseData && responseData.respond) {
+        if (responseData && typeof responseData.respond === 'string') {
           const status = responseData.respond;
           console.log('Response status value:', status);
           
@@ -145,7 +150,7 @@ const Evolution = () => {
       console.log('Updating QR code for instance:', instanceName);
       const response = await supabase.functions.invoke('secure-webhook-proxy', {
         body: {
-          url: 'https://webhook.serverwegrowup.com.br/webhook/atualizar-qr-code',
+          url: 'https://webhook.n8nlabz.com.br/webhook/atualizar-qr-code',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -159,14 +164,12 @@ const Evolution = () => {
       console.log('QR code update response:', response);
       
       if (response.data && !response.error) {
-        // Se a resposta é uma imagem base64, criar URL
-        if (typeof response.data === 'string' && response.data.startsWith('data:image')) {
-          setQrCodeData(response.data);
-        } else {
-          // Se é dados binários, criar blob URL
-          const qrCodeUrl = URL.createObjectURL(new Blob([response.data], { type: 'image/png' }));
-          setQrCodeData(qrCodeUrl);
-        }
+        console.log('Received response data type:', typeof response.data);
+        
+        // Criar blob URL assumindo que é dados binários de imagem
+        const blob = new Blob([response.data], { type: 'image/png' });
+        const qrCodeUrl = URL.createObjectURL(blob);
+        setQrCodeData(qrCodeUrl);
         setConfirmationStatus('waiting');
         retryCountRef.current = 0; // Reset retry counter when getting new QR code
         console.log('QR code updated successfully');
@@ -223,7 +226,7 @@ const Evolution = () => {
       console.log('Creating instance with name:', instanceName);
       const response = await supabase.functions.invoke('secure-webhook-proxy', {
         body: {
-          url: 'https://webhook.serverwegrowup.com.br/webhook/instanciaevolution',
+          url: 'https://webhook.n8nlabz.com.br/webhook/instanciaevolution',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -237,14 +240,12 @@ const Evolution = () => {
       console.log('Create instance response:', response);
       
       if (response.data && !response.error) {
-        // Se a resposta é uma imagem base64, usar diretamente
-        if (typeof response.data === 'string' && response.data.startsWith('data:image')) {
-          setQrCodeData(response.data);
-        } else {
-          // Se é dados binários, criar blob URL
-          const qrCodeUrl = URL.createObjectURL(new Blob([response.data], { type: 'image/png' }));
-          setQrCodeData(qrCodeUrl);
-        }
+        console.log('Received response data type:', typeof response.data);
+        
+        // Criar blob URL assumindo que é dados binários de imagem
+        const blob = new Blob([response.data], { type: 'image/png' });
+        const qrCodeUrl = URL.createObjectURL(blob);
+        setQrCodeData(qrCodeUrl);
         setConfirmationStatus('waiting');
         
         if (statusCheckIntervalRef.current !== null) {
