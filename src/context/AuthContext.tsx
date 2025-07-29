@@ -52,7 +52,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
-      // Primeiro fazer login
+      // Clean up any existing auth state first for security
+      try {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+            localStorage.removeItem(key);
+          }
+        });
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (cleanupError) {
+        console.warn('Auth cleanup warning (non-critical):', cleanupError);
+      }
+
+      // Perform sign in
       const { data: userData, error: authError } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
@@ -67,20 +79,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       if (userData.user && userData.session) {
-        // Invalidar todas as sessões anteriores deste usuário
+        // Invalidate all previous sessions for security
         await supabase.rpc('invalidate_previous_sessions', { 
           user_uuid: userData.user.id 
         });
         
-        // Registrar esta nova sessão como ativa
+        // Register new active session with enhanced security info
         await supabase.from('active_sessions').insert({
           user_id: userData.user.id,
-          session_id: userData.session.access_token.substring(0, 50),
+          session_id: userData.session.access_token.substring(0, 20), // Truncated for security
           device_info: {
-            userAgent: navigator.userAgent,
+            userAgent: navigator.userAgent.substring(0, 200), // Limit size for security
+            platform: navigator.platform,
+            language: navigator.language,
             timestamp: new Date().toISOString()
           },
-          ip_address: 'unknown'
+          ip_address: 'client_side' // Will be updated by backend if needed
         });
       }
       
@@ -90,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data: userData.session
       };
     } catch (error: any) {
+      console.error('Sign in error:', error);
       setIsLoading(false);
       return {
         error: error,

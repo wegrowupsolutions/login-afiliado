@@ -9,3 +9,6 @@ max_rows = 1000
 
 [functions.manage-user-bucket]
 verify_jwt = false
+
+[functions.secure-webhook-proxy]
+verify_jwt = true
