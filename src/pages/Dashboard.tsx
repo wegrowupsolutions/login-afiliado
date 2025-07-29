@@ -10,7 +10,7 @@ import ChatsCard from '@/components/dashboard/ChatsCard';
 import KnowledgeCard from '@/components/dashboard/KnowledgeCard';
 import ClientsCard from '@/components/dashboard/ClientsCard';
 import EvolutionCard from '@/components/dashboard/EvolutionCard';
-import ScheduleCard from '@/components/dashboard/ScheduleCard';
+
 import ConfigCard from '@/components/dashboard/ConfigCard';
 import AcademiaCard from '@/components/dashboard/AcademiaCard';
 import AgentConfigCard from '@/components/dashboard/AgentConfigCard';
@@ -82,7 +82,7 @@ const Dashboard = () => {
           <ClientsCard />
           <ChatsCard />
           <AcademiaCard />
-          {isAdmin && <ScheduleCard />}
+          
           {isAdmin && <ConfigCard />}
         </div>
       </div>
