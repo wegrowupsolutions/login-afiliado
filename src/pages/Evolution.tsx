@@ -226,7 +226,7 @@ const Evolution = () => {
       console.log('Creating instance with name:', instanceName);
       const response = await supabase.functions.invoke('secure-webhook-proxy', {
         body: {
-          url: 'https://webhook.n8nlabz.com.br/webhook/instanciaevolution',
+          url: 'https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
