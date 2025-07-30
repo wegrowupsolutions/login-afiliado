@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Link, Bot, Plus, QrCode, Loader2, RefreshCw, Check } from 'lucide-react';
+import { ArrowLeft, Link, Bot, Plus, QrCode, Loader2, RefreshCw, Check, Smartphone, AlertCircle, Wifi, CheckCircle, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -317,165 +317,398 @@ const Evolution = () => {
           </h2>
         </div>
         
-        <div className="max-w-xl mx-auto">
-          <Card className="dark:bg-gray-800 shadow-lg border-green-100 dark:border-green-900/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                {qrCodeData ? (
-                  <QrCode className="h-5 w-5" />
-                ) : (
-                  <Plus className="h-5 w-5" />
-                )}
-                {qrCodeData ? "Conectar WhatsApp" : "Criar Nova Instância"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {qrCodeData ? (
-                <div className="space-y-6 text-center">
-                  {confirmationStatus === 'waiting' ? (
-                    <>
-                      <div className="bg-white p-4 rounded-md inline-block mx-auto">
-                        <img 
-                          src={qrCodeData} 
-                          alt="QR Code para conectar WhatsApp" 
-                          className="mx-auto max-w-full h-auto"
-                          style={{ maxHeight: '250px' }}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2 text-center">
-                        <h3 className="font-medium text-lg">Conecte seu WhatsApp</h3>
-                        <ol className="text-sm text-gray-600 dark:text-gray-300 space-y-2 text-left list-decimal pl-5">
-                          <li>Abra o WhatsApp no seu celular</li>
-                          <li>Toque em Menu ou Configurações e selecione Aparelhos conectados</li>
-                          <li>Toque em Conectar um aparelho</li>
-                          <li>Escaneie o código QR</li>
-                        </ol>
-                        
-                        <div className="mt-4 flex items-center justify-center space-x-2 text-amber-600 dark:text-amber-400">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          <span>
-                            Aguardando conexão
-                            {retryCountRef.current > 0 ? ` (Tentativa ${retryCountRef.current}/${maxRetries})` : '...'}
-                          </span>
-                        </div>
-                        
-                        <Button 
-                          onClick={updateQrCode}
-                          variant="outline"
-                          size="sm"
-                          className="mt-2"
-                          disabled={isLoading}
-                        >
-                          <RefreshCw className="mr-2 h-4 w-4" />
-                          Atualizar QR Code
-                        </Button>
-                      </div>
-                    </>
-                  ) : confirmationStatus === 'confirmed' ? (
-                    <div className="p-6 text-center">
-                      <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Check className="h-10 w-10 text-green-600 dark:text-green-400" />
-                      </div>
-                      <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">Conectado com Sucesso!</h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        Seu WhatsApp foi conectado à instância <span className="font-semibold">{instanceName}</span>.
-                      </p>
-                      <Button 
-                        onClick={() => navigate('/dashboard')}
-                        variant="default"
-                        className="mt-4"
-                      >
-                        Voltar ao Dashboard
-                      </Button>
-                    </div>
-                  ) : confirmationStatus === 'failed' ? (
-                    <div className="p-6 text-center">
-                      <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                      <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">Falha na Conexão</h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        Não foi possível conectar o WhatsApp à instância <span className="font-semibold">{instanceName}</span>.
-                      </p>
-                      <Button 
-                        onClick={handleTryAgain}
-                        variant="default"
-                        className="mt-4 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <span className="flex items-center justify-center">
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Processando...
-                          </span>
-                        ) : (
-                          <>
-                            <RefreshCw className="mr-2 h-4 w-4" />
-                            Tentar Novamente
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  ) : null}
-                  
-                  {confirmationStatus !== 'confirmed' && confirmationStatus !== 'failed' && (
-                    <Button 
-                      onClick={resetQrCode}
-                      variant="outline"
-                      className="mt-4"
-                    >
-                      Voltar
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-4 pt-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="instance-name">Nome da Instância</Label>
-                      <Input 
-                        id="instance-name" 
-                        placeholder="Ex: Atendimento Principal" 
-                        className="dark:bg-gray-700"
-                        value={instanceName}
-                        onChange={(e) => setInstanceName(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && !isLoading) {
-                            handleCreateInstance();
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="pt-4">
-                    <Button 
-                      onClick={handleCreateInstance}
-                      className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
-                      disabled={isLoading || !instanceName.trim()}
-                    >
-                      {isLoading ? (
-                        <span className="flex items-center justify-center">
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Criando...
-                        </span>
-                      ) : (
-                        <>
-                          <Plus className="mr-2 h-4 w-4" />
-                          Criar Instância
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        <EvolutionConnection />
       </main>
+    </div>
+  );
+};
+
+// Componente EvolutionConnection
+const EvolutionConnection = () => {
+  const [step, setStep] = useState('idle'); // idle, creating, qr_code, connecting, connected, failed
+  const [instanceName, setInstanceName] = useState('');
+  const [qrCodeImage, setQrCodeImage] = useState(null);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const [logs, setLogs] = useState([]);
+  
+  const pollingInterval = useRef(null);
+  const maxAttempts = 30; // 30 tentativas = 1.5 minutos
+  
+  // Função para adicionar logs
+  const addLog = (message, type = 'info') => {
+    const timestamp = new Date().toLocaleTimeString();
+    setLogs(prev => [...prev, { message, type, timestamp }]);
+    console.log(`[${timestamp}] ${message}`);
+  };
+
+  // Função para criar instância
+  const createInstance = async () => {
+    if (!instanceName.trim()) {
+      setError('Por favor, digite um nome para a instância');
+      return;
+    }
+
+    setIsLoading(true);
+    setStep('creating');
+    setError('');
+    addLog(`Criando instância: ${instanceName}`, 'info');
+
+    try {
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          instanceName: instanceName.trim()
+        })
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setQrCodeImage(imageUrl);
+        setStep('qr_code');
+        addLog('Instância criada com sucesso! QR Code gerado.', 'success');
+        startConnectionPolling();
+      } else {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+    } catch (err) {
+      addLog(`Erro ao criar instância: ${err.message}`, 'error');
+      setError('Falha ao criar instância. Tente novamente.');
+      setStep('failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Função para verificar conexão
+  const checkConnection = async () => {
+    try {
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/pop-up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          instanceName: instanceName
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.respond === 'positivo') {
+        addLog('✅ Conexão estabelecida com sucesso!', 'success');
+        setStep('connected');
+        stopPolling();
+        return true;
+      } else {
+        addLog(`Tentativa ${connectionAttempts + 1}/${maxAttempts} - Aguardando conexão...`, 'info');
+        return false;
+      }
+    } catch (err) {
+      addLog(`Erro na verificação: ${err.message}`, 'error');
+      return false;
+    }
+  };
+
+  // Polling para verificar conexão
+  const startConnectionPolling = () => {
+    setStep('connecting');
+    setConnectionAttempts(0);
+    addLog('Iniciando verificação de conexão...', 'info');
+    
+    pollingInterval.current = setInterval(async () => {
+      const isConnected = await checkConnection();
+      
+      if (isConnected) {
+        return; // Para o polling
+      }
+      
+      setConnectionAttempts(prev => {
+        const newCount = prev + 1;
+        if (newCount >= maxAttempts) {
+          addLog('❌ Timeout na conexão. Tente gerar um novo QR Code.', 'error');
+          setStep('failed');
+          setError('Tempo limite excedido. Gere um novo QR Code.');
+          stopPolling();
+        }
+        return newCount;
+      });
+    }, 3000); // Verifica a cada 3 segundos
+  };
+
+  // Para o polling
+  const stopPolling = () => {
+    if (pollingInterval.current) {
+      clearInterval(pollingInterval.current);
+      pollingInterval.current = null;
+    }
+  };
+
+  // Função para resetar e tentar novamente
+  const resetConnection = () => {
+    stopPolling();
+    setStep('idle');
+    setQrCodeImage(null);
+    setError('');
+    setConnectionAttempts(0);
+    setLogs([]);
+    if (qrCodeImage) {
+      URL.revokeObjectURL(qrCodeImage);
+    }
+  };
+
+  // Função para atualizar QR Code
+  const refreshQrCode = async () => {
+    setIsLoading(true);
+    addLog('Atualizando QR Code...', 'info');
+    
+    try {
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/atualizar-qr-code-afiliado', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          instanceName: instanceName
+        })
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        if (qrCodeImage) {
+          URL.revokeObjectURL(qrCodeImage);
+        }
+        const imageUrl = URL.createObjectURL(blob);
+        setQrCodeImage(imageUrl);
+        addLog('QR Code atualizado com sucesso!', 'success');
+        setStep('qr_code');
+        setError('');
+        setConnectionAttempts(0);
+      } else {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+    } catch (err) {
+      addLog(`Erro ao atualizar QR Code: ${err.message}`, 'error');
+      setError('Falha ao atualizar QR Code.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      stopPolling();
+      if (qrCodeImage) {
+        URL.revokeObjectURL(qrCodeImage);
+      }
+    };
+  }, [qrCodeImage]);
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 bg-card text-card-foreground rounded-lg shadow-lg">
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Smartphone className="text-green-500" size={32} />
+          <h1 className="text-2xl font-bold">Conectar Evolution API</h1>
+        </div>
+        <p className="text-muted-foreground">Configure sua instância do WhatsApp</p>
+      </div>
+
+      {/* Input da Instância */}
+      {step === 'idle' && (
+        <div className="space-y-4">
+          <div>
+            <Label className="block text-sm font-medium mb-2">
+              Nome da Instância
+            </Label>
+            <Input
+              type="text"
+              value={instanceName}
+              onChange={(e) => setInstanceName(e.target.value)}
+              placeholder="Ex: minha-empresa-bot"
+              disabled={isLoading}
+            />
+          </div>
+          
+          {error && (
+            <div className="flex items-center gap-2 p-3 bg-destructive/15 border border-destructive/30 rounded-lg text-destructive">
+              <AlertCircle size={20} />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          <Button
+            onClick={createInstance}
+            disabled={isLoading || !instanceName.trim()}
+            className="w-full"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="animate-spin mr-2" size={20} />
+                Criando Instância...
+              </>
+            ) : (
+              <>
+                <Wifi className="mr-2" size={20} />
+                Criar Instância
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* QR Code */}
+      {step === 'qr_code' && (
+        <div className="text-center space-y-4">
+          <div className="bg-muted/50 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Escaneie o QR Code</h3>
+            {qrCodeImage && (
+              <img 
+                src={qrCodeImage} 
+                alt="QR Code" 
+                className="mx-auto max-w-xs border-2 border-border rounded-lg"
+              />
+            )}
+            <p className="text-sm text-muted-foreground mt-4">
+              Abra o WhatsApp → Menu → Dispositivos conectados → Conectar dispositivo
+            </p>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button
+              onClick={refreshQrCode}
+              disabled={isLoading}
+              variant="outline"
+              className="flex-1"
+            >
+              <RefreshCw className="mr-2" size={16} />
+              Atualizar QR Code
+            </Button>
+            <Button
+              onClick={resetConnection}
+              variant="outline"
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Conectando */}
+      {step === 'connecting' && (
+        <div className="text-center space-y-4">
+          <div className="bg-muted/50 p-6 rounded-lg">
+            <Loader2 className="animate-spin mx-auto mb-4 text-blue-500" size={48} />
+            <h3 className="text-lg font-semibold mb-2">Conectando...</h3>
+            <p className="text-muted-foreground mb-4">
+              Aguardando conexão com o WhatsApp
+            </p>
+            <div className="bg-background p-2 rounded border text-sm">
+              Tentativa: {connectionAttempts}/{maxAttempts}
+            </div>
+          </div>
+          
+          <Button
+            onClick={resetConnection}
+            variant="outline"
+            className="w-full"
+          >
+            Cancelar
+          </Button>
+        </div>
+      )}
+
+      {/* Conectado */}
+      {step === 'connected' && (
+        <div className="text-center space-y-4">
+          <div className="bg-green-50 dark:bg-green-950/30 p-6 rounded-lg">
+            <CheckCircle className="mx-auto mb-4 text-green-500" size={48} />
+            <h3 className="text-lg font-semibold text-green-700 dark:text-green-400 mb-2">
+              Conexão Realizada com Sucesso!
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Sua instância <strong>{instanceName}</strong> está conectada e pronta para uso.
+            </p>
+          </div>
+          
+          <Button
+            onClick={resetConnection}
+            className="w-full"
+          >
+            Criar Nova Instância
+          </Button>
+        </div>
+      )}
+
+      {/* Erro */}
+      {step === 'failed' && (
+        <div className="text-center space-y-4">
+          <div className="bg-destructive/15 p-6 rounded-lg">
+            <XCircle className="mx-auto mb-4 text-destructive" size={48} />
+            <h3 className="text-lg font-semibold text-destructive mb-2">
+              Falha na Conexão
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Não foi possível conectar a instância <strong>{instanceName}</strong>.
+            </p>
+            {error && (
+              <div className="bg-background p-3 rounded border text-sm text-destructive">
+                {error}
+              </div>
+            )}
+          </div>
+          
+          <div className="flex gap-2">
+            <Button
+              onClick={refreshQrCode}
+              disabled={isLoading}
+              variant="outline"
+              className="flex-1"
+            >
+              Tentar Novamente
+            </Button>
+            <Button
+              onClick={resetConnection}
+              variant="outline"
+              className="flex-1"
+            >
+              Recomeçar
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Logs de Debug */}
+      {logs.length > 0 && (
+        <div className="mt-8">
+          <details className="bg-muted/50 rounded-lg">
+            <summary className="p-3 cursor-pointer font-medium">
+              Logs de Conexão ({logs.length})
+            </summary>
+            <div className="p-3 border-t max-h-40 overflow-y-auto">
+              {logs.map((log, index) => (
+                <div 
+                  key={index} 
+                  className={`text-xs mb-1 ${
+                    log.type === 'error' ? 'text-destructive' : 
+                    log.type === 'success' ? 'text-green-600 dark:text-green-400' : 
+                    'text-muted-foreground'
+                  }`}
+                >
+                  <span className="text-muted-foreground/60">{log.timestamp}</span> - {log.message}
+                </div>
+              ))}
+            </div>
+          </details>
+        </div>
+      )}
     </div>
   );
 };
