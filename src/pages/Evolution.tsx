@@ -10,7 +10,6 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 const Evolution = () => {
   const navigate = useNavigate();
@@ -35,27 +34,24 @@ const Evolution = () => {
   const checkConnectionStatus = async () => {
     try {
       console.log('Checking connection status for:', instanceName);
-      const response = await supabase.functions.invoke('secure-webhook-proxy', {
-        body: {
-          url: 'https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            instanceName: instanceName.trim() 
-          })
-        }
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          instanceName: instanceName.trim() 
+        }),
       });
       
-      if (response.data && !response.error) {
-        const responseText = JSON.stringify(response.data);
+      if (response.ok) {
+        const responseText = await response.text();
         console.log('Connection status response:', responseText);
         
         let responseData;
         
         try {
-          responseData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+          responseData = JSON.parse(responseText);
           console.log('Parsed response data:', responseData);
         } catch (parseError) {
           console.error('Error parsing response JSON:', parseError);
@@ -127,10 +123,10 @@ const Evolution = () => {
           });
         }
       } else {
-        console.error('Erro ao verificar status:', response.error);
+        console.error('Erro ao verificar status:', await response.text());
         toast({
           title: "Erro na verificação",
-          description: response.error?.message || "Não foi possível verificar o status da conexão.",
+          description: "Não foi possível verificar o status da conexão.",
           variant: "destructive"
         });
       }
@@ -148,26 +144,22 @@ const Evolution = () => {
     try {
       setIsLoading(true);
       console.log('Updating QR code for instance:', instanceName);
-      const response = await supabase.functions.invoke('secure-webhook-proxy', {
-        body: {
-          url: 'https://webhook.n8nlabz.com.br/webhook/atualizar-qr-code',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            instanceName: instanceName.trim() 
-          })
-        }
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          instanceName: instanceName.trim() 
+        }),
       });
       
-      console.log('QR code update response:', response);
+      console.log('QR code update response status:', response.status);
       
-      if (response.data && !response.error) {
-        console.log('Received response data type:', typeof response.data);
+      if (response.ok) {
+        const blob = await response.blob();
+        console.log('Received blob content type:', blob.type);
         
-        // Criar blob URL assumindo que é dados binários de imagem
-        const blob = new Blob([response.data], { type: 'image/png' });
         const qrCodeUrl = URL.createObjectURL(blob);
         setQrCodeData(qrCodeUrl);
         setConfirmationStatus('waiting');
@@ -188,10 +180,11 @@ const Evolution = () => {
           description: "Escaneie o novo QR code para conectar seu WhatsApp.",
         });
       } else {
-        console.error('Falha ao atualizar QR code:', response.error);
+        const errorText = await response.text();
+        console.error('Falha ao atualizar QR code:', errorText);
         toast({
           title: "Erro",
-          description: response.error?.message || "Não foi possível atualizar o QR code. Tente novamente.",
+          description: "Não foi possível atualizar o QR code. Tente novamente.",
           variant: "destructive"
         });
       }
@@ -224,26 +217,22 @@ const Evolution = () => {
     
     try {
       console.log('Creating instance with name:', instanceName);
-      const response = await supabase.functions.invoke('secure-webhook-proxy', {
-        body: {
-          url: 'https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            instanceName: instanceName.trim() 
-          })
-        }
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          instanceName: instanceName.trim() 
+        }),
       });
       
-      console.log('Create instance response:', response);
+      console.log('Create instance response status:', response.status);
       
-      if (response.data && !response.error) {
-        console.log('Received response data type:', typeof response.data);
+      if (response.ok) {
+        const blob = await response.blob();
+        console.log('Received blob content type:', blob.type);
         
-        // Criar blob URL assumindo que é dados binários de imagem
-        const blob = new Blob([response.data], { type: 'image/png' });
         const qrCodeUrl = URL.createObjectURL(blob);
         setQrCodeData(qrCodeUrl);
         setConfirmationStatus('waiting');
@@ -262,8 +251,9 @@ const Evolution = () => {
           description: "Escaneie o QR code para conectar seu WhatsApp.",
         });
       } else {
-        console.error('Falha ao criar instância:', response.error);
-        throw new Error(response.error?.message || 'Falha ao criar instância');
+        const errorText = await response.text();
+        console.error('Falha ao criar instância:', errorText);
+        throw new Error('Falha ao criar instância');
       }
     } catch (error) {
       console.error('Erro ao criar instância:', error);
