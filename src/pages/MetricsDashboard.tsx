@@ -53,12 +53,10 @@ const MetricsDashboard = () => {
         { name: 'Não especificado', value: 100, color: '#8B5CF6' }
       ];
 
-  const petServicesData = [
-    { name: 'Banho', value: 45 },
-    { name: 'Tosa', value: 35 },
-    { name: 'Consulta', value: 20 },
-    { name: 'Vacinas', value: 30 },
-    { name: 'Compras', value: 25 },
+  const funnelData = [
+    { name: "Iniciaram Conversa", value: 450, color: "#10B981" },
+    { name: "+10 Mensagens", value: 320, color: "#3B82F6" },
+    { name: "Pediram Link", value: 180, color: "#8B5CF6" }
   ];
   
   // Use real client data from the database
@@ -133,7 +131,7 @@ const MetricsDashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ServicesBarChart data={petServicesData} />
+          <ServicesBarChart data={funnelData} />
           <RecentClientsTable clients={recentClientsData} loading={loading} />
         </div>
       </main>
