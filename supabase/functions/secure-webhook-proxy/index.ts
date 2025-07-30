@@ -65,7 +65,7 @@ serve(async (req) => {
     }
 
     // Validate URL to prevent SSRF attacks
-    const allowedDomains = ['webhook.n8nlabz.com.br']
+    const allowedDomains = ['webhook.n8nlabz.com.br', 'webhook.serverwegrowup.com.br']
     const urlObj = new URL(url)
     if (!allowedDomains.includes(urlObj.hostname)) {
       return new Response(
