@@ -34,7 +34,7 @@ const Evolution = () => {
   const checkConnectionStatus = async () => {
     try {
       console.log('Checking connection status for:', instanceName);
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado', {
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/pop-up', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -224,7 +224,7 @@ const Evolution = () => {
       let useSimulation = false;
       
       try {
-        response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instanciaevolution-afiliado', {
+        response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
