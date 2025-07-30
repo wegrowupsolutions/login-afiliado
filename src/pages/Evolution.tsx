@@ -59,52 +59,67 @@ const EvolutionConnection = () => {
   // Função para iniciar polling automático
   const startAutomaticPolling = () => {
     updateState({ step: 'connecting', connectionAttempts: 0 });
+    
+    console.log('🔄 Iniciando polling para:', state.instanceName);
     addLog('Iniciando verificação automática de conexão...', 'info');
-    startConnectionPolling();
-  };
+    
+    const interval = setInterval(async () => {
+      console.log(`🔍 Tentativa ${state.connectionAttempts + 1}/3`);
+      
+      try {
+        const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/pop-up', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ instanceName: state.instanceName })
+        });
 
-  // Função para verificar conexão
-  const checkConnection = async () => {
-    try {
-      const result = await EvolutionApiClient.checkConnection(state.instanceName);
-      
-      if (result.respond === 'positivo') {
-        addLog('✅ Conexão estabelecida com sucesso!', 'success');
-        updateState({ step: 'connected' });
-        stopPolling();
-        return true;
-      } else {
-        addLog(`Tentativa ${state.connectionAttempts + 1}/${maxAttempts} - Aguardando conexão...`, 'info');
-        return false;
-      }
-    } catch (err: any) {
-      addLog(`Erro na verificação: ${err.message}`, 'error');
-      return false;
-    }
-  };
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
 
-  // Polling para verificar conexão
-  const startConnectionPolling = () => {
-    pollingInterval.current = setInterval(async () => {
-      const isConnected = await checkConnection();
-      
-      if (isConnected) {
-        return; // Para o polling
-      }
-      
-      updateState({ 
-        connectionAttempts: state.connectionAttempts + 1 
-      });
-      
-      if (state.connectionAttempts + 1 >= maxAttempts) {
-        addLog('❌ Timeout na conexão. Tente gerar um novo QR Code.', 'error');
+        const result = await response.json();
+        console.log('📋 Result:', result);
+        
+        if (result.respond === 'positivo') {
+          console.log('✅ CONEXÃO CONFIRMADA!');
+          clearInterval(interval);
+          addLog('✅ Conexão estabelecida com sucesso!', 'success');
+          updateState({ step: 'connected' });
+          return;
+        }
+
+        // Incrementar tentativas
+        const newCount = state.connectionAttempts + 1;
+        console.log(`⏰ Tentativa ${newCount}/3`);
+        addLog(`Tentativa ${newCount}/${maxAttempts} - Aguardando conexão...`, 'info');
+        
+        if (newCount >= maxAttempts) {
+          console.log('❌ TIMEOUT - 3 tentativas esgotadas');
+          clearInterval(interval);
+          addLog('❌ Conexão não confirmada em 3 tentativas', 'error');
+          updateState({ 
+            step: 'failed',
+            error: 'Conexão não confirmada em 3 tentativas',
+            connectionAttempts: newCount
+          });
+        } else {
+          updateState({ connectionAttempts: newCount });
+        }
+
+      } catch (err: any) {
+        console.error('🚨 Erro no polling:', err);
+        clearInterval(interval);
+        addLog(`Erro na verificação: ${err.message}`, 'error');
         updateState({ 
           step: 'failed',
-          error: 'Tempo limite excedido. Gere um novo QR Code.' 
+          error: `Erro na verificação: ${err.message}` 
         });
-        stopPolling();
       }
-    }, 3000); // Verifica a cada 3 segundos
+    }, 3000); // 3 segundos
+    
+    pollingInterval.current = interval;
   };
 
   // Para o polling
