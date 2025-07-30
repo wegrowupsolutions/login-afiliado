@@ -135,7 +135,7 @@ const BrazilMap: React.FC<PetTypesChartProps> = ({ loading }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[32rem]">
+        <div className="h-80">
           {isLoading || loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -152,7 +152,7 @@ const BrazilMap: React.FC<PetTypesChartProps> = ({ loading }) => {
                   scale: 650
                 }}
                 width={800}
-                height={400}
+                height={320}
                 style={{ width: '100%', height: '100%' }}
               >
                 <ZoomableGroup>
