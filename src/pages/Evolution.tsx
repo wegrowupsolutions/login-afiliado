@@ -40,7 +40,8 @@ const Evolution = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          instanceName: instanceName.trim() 
+          instanceName: instanceName.trim(),
+          userId: user?.id
         }),
       });
       
