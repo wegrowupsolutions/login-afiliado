@@ -123,52 +123,8 @@ const BrazilMap: React.FC<PetTypesChartProps> = ({ loading }) => {
     return state ? state.clients : 0;
   };
 
-  // Geometria simplificada do Brasil para demonstração
-  const brazilGeometry = {
-    "type": "FeatureCollection",
-    "features": [
-      {
-        "type": "Feature",
-        "properties": { "name": "São Paulo", "sigla": "SP" },
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [[[-53.1, -19.8], [-44.2, -19.8], [-44.2, -25.3], [-53.1, -25.3], [-53.1, -19.8]]]
-        }
-      },
-      {
-        "type": "Feature",
-        "properties": { "name": "Rio de Janeiro", "sigla": "RJ" },
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [[[-44.9, -20.8], [-40.9, -20.8], [-40.9, -23.4], [-44.9, -23.4], [-44.9, -20.8]]]
-        }
-      },
-      {
-        "type": "Feature",
-        "properties": { "name": "Minas Gerais", "sigla": "MG" },
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [[[-51.0, -14.2], [-39.9, -14.2], [-39.9, -22.9], [-51.0, -22.9], [-51.0, -14.2]]]
-        }
-      },
-      {
-        "type": "Feature",
-        "properties": { "name": "Bahia", "sigla": "BA" },
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [[[-46.6, -8.5], [-37.3, -8.5], [-37.3, -18.3], [-46.6, -18.3], [-46.6, -8.5]]]
-        }
-      },
-      {
-        "type": "Feature",
-        "properties": { "name": "Paraná", "sigla": "PR" },
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [[[-54.6, -22.5], [-48.0, -22.5], [-48.0, -26.7], [-54.6, -26.7], [-54.6, -22.5]]]
-        }
-      }
-    ]
-  };
+  // URL para o GeoJSON do Brasil
+  const brazilGeoJsonUrl = "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson";
 
   return (
     <Card className="dark:bg-gray-800 transition-all duration-300 hover:shadow-lg">
@@ -200,10 +156,10 @@ const BrazilMap: React.FC<PetTypesChartProps> = ({ loading }) => {
                 style={{ width: '100%', height: '100%' }}
               >
                 <ZoomableGroup>
-                  <Geographies geography={brazilGeometry}>
+                  <Geographies geography={brazilGeoJsonUrl}>
                     {({ geographies }) =>
                       geographies.map((geo) => {
-                        const stateId = geo.properties.sigla || geo.id;
+                        const stateId = geo.properties.sigla || geo.properties.SIGLA || geo.properties.name || geo.id;
                         const clients = getStateClients(stateId);
                         
                         return (
@@ -211,13 +167,18 @@ const BrazilMap: React.FC<PetTypesChartProps> = ({ loading }) => {
                             key={geo.rsmKey}
                             geography={geo}
                             fill={getStateColor(stateId)}
-                            stroke="#ffffff"
-                            strokeWidth={0.5}
+                            stroke="#374151"
+                            strokeWidth={0.75}
                             style={{
-                              default: { outline: 'none' },
+                              default: { 
+                                outline: 'none',
+                                transition: 'all 0.2s ease-in-out'
+                              },
                               hover: { 
                                 outline: 'none',
-                                filter: 'brightness(1.1)',
+                                fill: `${getStateColor(stateId)}DD`,
+                                stroke: '#8B5CF6',
+                                strokeWidth: 1.5,
                                 cursor: 'pointer'
                               },
                               pressed: { outline: 'none' }
