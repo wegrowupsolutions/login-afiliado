@@ -148,8 +148,8 @@ const BrazilMap: React.FC<PetTypesChartProps> = ({ loading }) => {
               <ComposableMap
                 projection="geoMercator"
                 projectionConfig={{
-                  center: [-52, -14],
-                  scale: 650
+                  center: [-52, -15],
+                  scale: 500
                 }}
                 width={800}
                 height={320}
