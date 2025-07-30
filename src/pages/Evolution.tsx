@@ -21,8 +21,8 @@ const EvolutionConnection = () => {
     console.log(`[${timestamp}] ${message}`);
   };
 
-  // Função para criar instância
-  const createInstance = async () => {
+  // Função para criar nova instância
+  const createNewInstance = async () => {
     const validationError = validateInstanceName(state.instanceName);
     if (validationError) {
       updateState({ error: validationError });
@@ -30,18 +30,17 @@ const EvolutionConnection = () => {
     }
 
     updateState({ isLoading: true, step: 'creating', error: '' });
-    addLog(`Criando instância: ${state.instanceName}`, 'info');
+    addLog(`Criando nova instância: ${state.instanceName}`, 'info');
 
     try {
       const blob = await EvolutionApiClient.createInstance(state.instanceName.trim());
       const imageUrl = URL.createObjectURL(blob);
       updateState({ 
         qrCodeImage: imageUrl, 
-        step: 'qr_code',
+        step: 'qr_code',  // MOSTRAR QR CODE PRIMEIRO!
         isLoading: false 
       });
       addLog('Instância criada com sucesso! QR Code gerado.', 'success');
-      startConnectionPolling();
     } catch (err: any) {
       addLog(`Erro ao criar instância: ${err.message}`, 'error');
       updateState({ 
@@ -50,6 +49,43 @@ const EvolutionConnection = () => {
         isLoading: false 
       });
     }
+  };
+
+  // Função para gerar QR Code (para instâncias existentes)
+  const generateQrCode = async () => {
+    const validationError = validateInstanceName(state.instanceName);
+    if (validationError) {
+      updateState({ error: validationError });
+      return;
+    }
+
+    updateState({ isLoading: true, step: 'generate_qr', error: '' });
+    addLog(`Gerando QR Code para instância: ${state.instanceName}`, 'info');
+
+    try {
+      const blob = await EvolutionApiClient.refreshQrCode(state.instanceName.trim());
+      const imageUrl = URL.createObjectURL(blob);
+      updateState({ 
+        qrCodeImage: imageUrl, 
+        step: 'qr_code',  // MOSTRAR QR CODE PRIMEIRO!
+        isLoading: false 
+      });
+      addLog('QR Code gerado com sucesso!', 'success');
+    } catch (err: any) {
+      addLog(`Erro ao gerar QR Code: ${err.message}`, 'error');
+      updateState({ 
+        error: 'Falha ao gerar QR Code. Tente novamente.',
+        step: 'failed',
+        isLoading: false 
+      });
+    }
+  };
+
+  // Função para iniciar verificação APÓS usuário escanear QR
+  const startConnectionVerification = () => {
+    updateState({ step: 'connecting', connectionAttempts: 0 });
+    addLog('Iniciando verificação de conexão...', 'info');
+    startConnectionPolling();
   };
 
   // Função para verificar conexão
@@ -74,9 +110,6 @@ const EvolutionConnection = () => {
 
   // Polling para verificar conexão
   const startConnectionPolling = () => {
-    updateState({ step: 'connecting', connectionAttempts: 0 });
-    addLog('Iniciando verificação de conexão...', 'info');
-    
     pollingInterval.current = setInterval(async () => {
       const isConnected = await checkConnection();
       
@@ -107,7 +140,7 @@ const EvolutionConnection = () => {
     }
   };
 
-  // Função para atualizar QR Code
+  // Função para atualizar QR Code existente
   const refreshQrCode = async () => {
     updateState({ isLoading: true });
     addLog('Atualizando QR Code...', 'info');
@@ -120,7 +153,7 @@ const EvolutionConnection = () => {
       const imageUrl = URL.createObjectURL(blob);
       updateState({ 
         qrCodeImage: imageUrl,
-        step: 'qr_code',
+        step: 'qr_code',  // Voltar para mostrar QR Code
         error: '',
         connectionAttempts: 0,
         isLoading: false
@@ -135,7 +168,7 @@ const EvolutionConnection = () => {
     }
   };
 
-  // Função para resetar e tentar novamente
+  // Função para resetar
   const handleReset = () => {
     stopPolling();
     resetConnection();
@@ -162,7 +195,7 @@ const EvolutionConnection = () => {
         <p className="text-muted-foreground">Configure sua instância do WhatsApp</p>
       </div>
 
-      {/* Input da Instância */}
+      {/* Tela Inicial - Input + 2 Botões */}
       {state.step === 'idle' && (
         <div className="space-y-4">
           <div>
@@ -186,70 +219,111 @@ const EvolutionConnection = () => {
             </div>
           )}
           
-          <button
-            onClick={createInstance}
-            disabled={state.isLoading || !state.instanceName.trim()}
-            className="w-full bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {state.isLoading ? (
-              <>
-                <Loader2 className="animate-spin" size={20} />
-                Criando Instância...
-              </>
-            ) : (
-              <>
-                <Wifi size={20} />
-                Criar Instância
-              </>
-            )}
-          </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button
+              onClick={createNewInstance}
+              disabled={state.isLoading || !state.instanceName.trim()}
+              className="bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {state.isLoading ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  Criando...
+                </>
+              ) : (
+                <>
+                  <Wifi size={20} />
+                  🆕 Criar Nova Instância
+                </>
+              )}
+            </button>
+            
+            <button
+              onClick={generateQrCode}
+              disabled={state.isLoading || !state.instanceName.trim()}
+              className="bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {state.isLoading ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  Gerando...
+                </>
+              ) : (
+                <>
+                  <RefreshCw size={20} />
+                  🔄 Gerar QR Code
+                </>
+              )}
+            </button>
+          </div>
         </div>
       )}
 
-      {/* QR Code */}
+      {/* QR Code Visível - NOVO ESTADO! */}
       {state.step === 'qr_code' && (
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-6">
           <div className="bg-muted p-6 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">Escaneie o QR Code</h3>
+            <h3 className="text-lg font-semibold mb-4">📱 Escaneie o QR Code</h3>
             {state.qrCodeImage && (
-              <img 
-                src={state.qrCodeImage} 
-                alt="QR Code" 
-                className="mx-auto max-w-xs border-2 border-border rounded-lg"
-              />
+              <div className="flex justify-center mb-4">
+                <img 
+                  src={state.qrCodeImage} 
+                  alt="QR Code" 
+                  className="max-w-xs w-full border-2 border-border rounded-lg shadow-md"
+                />
+              </div>
             )}
-            <p className="text-sm text-muted-foreground mt-4">
-              Abra o WhatsApp → Menu → Dispositivos conectados → Conectar dispositivo
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p>1. Abra o WhatsApp no seu celular</p>
+              <p>2. Vá em Menu → Dispositivos conectados</p>
+              <p>3. Toque em "Conectar dispositivo"</p>
+              <p>4. Escaneie o QR Code acima</p>
+            </div>
+          </div>
+          
+          <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              ⏱️ Após escanear o QR Code, clique em "Iniciar Verificação" para confirmar a conexão
             </p>
           </div>
           
-          <div className="flex gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <button
               onClick={refreshQrCode}
               disabled={state.isLoading}
-              className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <RefreshCw size={16} />
-              Atualizar QR Code
+              🔄 Atualizar QR
             </button>
+            
+            <button
+              onClick={startConnectionVerification}
+              className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 flex items-center justify-center gap-2"
+            >
+              <CheckCircle size={16} />
+              ✅ Iniciar Verificação
+            </button>
+            
             <button
               onClick={handleReset}
-              className="flex-1 bg-muted text-muted-foreground py-2 px-4 rounded-lg hover:bg-muted/80"
+              className="bg-muted text-muted-foreground py-2 px-4 rounded-lg hover:bg-muted/80 flex items-center justify-center gap-2"
             >
-              Cancelar
+              <XCircle size={16} />
+              ❌ Cancelar
             </button>
           </div>
         </div>
       )}
 
-      {/* Conectando */}
+      {/* Verificando Conexão - Polling */}
       {state.step === 'connecting' && (
         <div className="text-center space-y-4">
           <div className="bg-blue-50 dark:bg-blue-950/30 p-6 rounded-lg">
             <Loader2 className="animate-spin mx-auto mb-4 text-blue-500" size={48} />
-            <h3 className="text-lg font-semibold mb-2">Conectando...</h3>
+            <h3 className="text-lg font-semibold mb-2">🔍 Verificando Conexão...</h3>
             <p className="text-muted-foreground mb-4">
-              Aguardando conexão com o WhatsApp
+              Aguardando confirmação da conexão com o WhatsApp
             </p>
             <div className="bg-background p-2 rounded border text-sm">
               Tentativa: {state.connectionAttempts}/{maxAttempts}
@@ -260,18 +334,18 @@ const EvolutionConnection = () => {
             onClick={handleReset}
             className="w-full bg-muted text-muted-foreground py-2 px-4 rounded-lg hover:bg-muted/80"
           >
-            Cancelar
+            Cancelar Verificação
           </button>
         </div>
       )}
 
-      {/* Conectado */}
+      {/* Sucesso - Conectado */}
       {state.step === 'connected' && (
         <div className="text-center space-y-4">
           <div className="bg-green-50 dark:bg-green-950/30 p-6 rounded-lg">
             <CheckCircle className="mx-auto mb-4 text-green-500" size={48} />
             <h3 className="text-lg font-semibold text-green-700 dark:text-green-400 mb-2">
-              Conexão Realizada com Sucesso!
+              🎉 Conexão Realizada com Sucesso!
             </h3>
             <p className="text-muted-foreground mb-4">
               Sua instância <strong>{state.instanceName}</strong> está conectada e pronta para uso.
@@ -282,7 +356,7 @@ const EvolutionConnection = () => {
             onClick={handleReset}
             className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
           >
-            Criar Nova Instância
+            🆕 Criar Nova Instância
           </button>
         </div>
       )}
@@ -293,7 +367,7 @@ const EvolutionConnection = () => {
           <div className="bg-destructive/10 p-6 rounded-lg">
             <XCircle className="mx-auto mb-4 text-destructive" size={48} />
             <h3 className="text-lg font-semibold text-destructive mb-2">
-              Falha na Conexão
+              ❌ Falha na Conexão
             </h3>
             <p className="text-muted-foreground mb-4">
               Não foi possível conectar a instância <strong>{state.instanceName}</strong>.
@@ -307,17 +381,17 @@ const EvolutionConnection = () => {
           
           <div className="flex gap-2">
             <button
-              onClick={refreshQrCode}
+              onClick={generateQrCode}
               disabled={state.isLoading}
               className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50"
             >
-              Tentar Novamente
+              🔄 Gerar Novo QR Code
             </button>
             <button
               onClick={handleReset}
               className="flex-1 bg-muted text-muted-foreground py-2 px-4 rounded-lg hover:bg-muted/80"
             >
-              Recomeçar
+              🔄 Recomeçar
             </button>
           </div>
         </div>
@@ -328,7 +402,7 @@ const EvolutionConnection = () => {
         <div className="mt-8">
           <details className="bg-muted rounded-lg">
             <summary className="p-3 cursor-pointer font-medium text-card-foreground">
-              Logs de Conexão ({logs.length})
+              📋 Logs de Conexão ({logs.length})
             </summary>
             <div className="p-3 border-t max-h-40 overflow-y-auto">
               {logs.map((log, index) => (

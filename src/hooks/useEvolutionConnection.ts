@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 
 export interface ConnectionState {
-  step: 'idle' | 'creating' | 'qr_code' | 'connecting' | 'connected' | 'failed';
+  step: 'idle' | 'creating' | 'generate_qr' | 'qr_code' | 'connecting' | 'connected' | 'failed';
   instanceName: string;
   qrCodeImage: string | null;
   error: string;
