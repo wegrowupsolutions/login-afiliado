@@ -5,10 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Play, Clock, Users, Star, ArrowLeft } from 'lucide-react';
 import VideoDialog from '@/components/ui/video-dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Academia = () => {
   const [selectedVideo, setSelectedVideo] = React.useState<{ id: number; title: string; url: string } | null>(null);
+  const [isLoadingSupport, setIsLoadingSupport] = React.useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const videos = [
     {
@@ -71,6 +75,36 @@ const Academia = () => {
     const video = videos.find(v => v.id === videoId);
     if (video) {
       setSelectedVideo({ id: video.id, title: video.title, url: video.url });
+    }
+  };
+
+  const handleContactSupport = async () => {
+    setIsLoadingSupport(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('send-support-email', {
+        body: {
+          name: 'Usuário da Academia',
+          email: 'usuario@exemplo.com',
+          message: 'Solicitação de suporte através da Academia Afiliado IA'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email enviado!",
+        description: "Sua solicitação foi enviada para nossa equipe de suporte.",
+      });
+    } catch (error) {
+      console.error('Error sending support email:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível enviar o email. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingSupport(false);
     }
   };
 
@@ -163,8 +197,13 @@ const Academia = () => {
                   Entre em contato com nossa equipe de suporte para tirar suas dúvidas
                 </p>
               </div>
-              <Button variant="secondary" className="bg-white text-primary hover:bg-gray-100">
-                Falar com Suporte
+              <Button 
+                variant="secondary" 
+                className="bg-white text-primary hover:bg-gray-100"
+                onClick={handleContactSupport}
+                disabled={isLoadingSupport}
+              >
+                {isLoadingSupport ? "Enviando..." : "Falar com Suporte"}
               </Button>
             </div>
           </CardContent>
