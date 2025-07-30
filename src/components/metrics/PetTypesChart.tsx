@@ -135,7 +135,7 @@ const BrazilMap: React.FC<PetTypesChartProps> = ({ loading }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-80">
+        <div className="h-96">
           {isLoading || loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -148,8 +148,8 @@ const BrazilMap: React.FC<PetTypesChartProps> = ({ loading }) => {
               <ComposableMap
                 projection="geoMercator"
                 projectionConfig={{
-                  center: [-54, -15],
-                  scale: 700
+                  center: [-52, -14],
+                  scale: 600
                 }}
                 width={800}
                 height={320}
