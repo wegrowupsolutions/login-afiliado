@@ -21,7 +21,7 @@ const Evolution = () => {
   const [confirmationStatus, setConfirmationStatus] = useState<'waiting' | 'confirmed' | 'failed' | null>(null);
   const statusCheckIntervalRef = useRef<number | null>(null);
   const retryCountRef = useRef<number>(0);
-  const maxRetries = 3;
+  const maxRetries = 5; // Aumentei para 5 tentativas
   
   useEffect(() => {
     return () => {
@@ -33,118 +33,116 @@ const Evolution = () => {
   
   const checkConnectionStatus = async () => {
     try {
-      console.log('Checking connection status for:', instanceName);
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/pop-up', {
+      console.log('🔍 Verificando status de conexão para:', instanceName);
+      
+      // Usar o endpoint correto baseado no webhook ID do n8n
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/a0284a1e-64e1-4691-be2e-6eed40cb57f0', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
           instanceName: instanceName.trim(),
-          userId: user?.id
+          action: 'check_status'
         }),
       });
       
+      console.log('📡 Response status:', response.status);
+      
       if (response.ok) {
         const responseText = await response.text();
-        console.log('Connection status response:', responseText);
+        console.log('📄 Raw response:', responseText);
         
         let responseData;
-        
         try {
           responseData = JSON.parse(responseText);
-          console.log('Parsed response data:', responseData);
+          console.log('✅ Parsed response:', responseData);
         } catch (parseError) {
-          console.error('Error parsing response JSON:', parseError);
+          console.error('❌ Erro ao parsear JSON:', parseError);
           toast({
             title: "Erro no formato da resposta",
-            description: "Não foi possível processar a resposta do servidor.",
+            description: "Resposta do servidor inválida.",
             variant: "destructive"
           });
           return;
         }
         
-        if (responseData && typeof responseData.respond === 'string') {
-          const status = responseData.respond;
-          console.log('Response status value:', status);
+        // Verificar diferentes formatos de resposta possíveis
+        const status = responseData?.respond || responseData?.status || responseData?.data?.status;
+        
+        if (status === "positivo" || status === "connected" || status === "success") {
+          console.log('✅ Conexão confirmada!');
+          if (statusCheckIntervalRef.current !== null) {
+            clearInterval(statusCheckIntervalRef.current);
+            statusCheckIntervalRef.current = null;
+          }
+          setConfirmationStatus('confirmed');
+          retryCountRef.current = 0;
+          toast({
+            title: "Conexão estabelecida!",
+            description: "Seu WhatsApp foi conectado com sucesso.",
+            variant: "default" 
+          });
+        } else if (status === "negativo" || status === "disconnected" || status === "failed") {
+          retryCountRef.current += 1;
+          console.log(`❌ Tentativa ${retryCountRef.current} de ${maxRetries} falhou`);
           
-          if (status === "positivo") {
-            console.log('Connection confirmed - stopping interval');
+          if (retryCountRef.current >= maxRetries) {
+            console.log('🔄 Máximo de tentativas atingido, atualizando QR code...');
             if (statusCheckIntervalRef.current !== null) {
               clearInterval(statusCheckIntervalRef.current);
               statusCheckIntervalRef.current = null;
             }
-            setConfirmationStatus('confirmed');
-            retryCountRef.current = 0; // Reset retry counter on success
-            toast({
-              title: "Conexão estabelecida!",
-              description: "Seu WhatsApp foi conectado com sucesso.",
-              variant: "default" 
-            });
-          } else if (status === "negativo") {
-            retryCountRef.current += 1;
-            console.log(`Connection failed - attempt ${retryCountRef.current} of ${maxRetries}`);
             
-            if (retryCountRef.current >= maxRetries) {
-              console.log('Maximum retry attempts reached - updating QR code');
-              if (statusCheckIntervalRef.current !== null) {
-                clearInterval(statusCheckIntervalRef.current);
-                statusCheckIntervalRef.current = null;
-              }
-              setConfirmationStatus('failed');
-              retryCountRef.current = 0; // Reset retry counter
-              toast({
-                title: "Falha na conexão",
-                description: "Não foi possível conectar após várias tentativas. Obtendo novo QR code...",
-                variant: "destructive"
-              });
-              updateQrCode(); // Automatically get a new QR code
-            } else {
-              console.log(`Retrying... (${retryCountRef.current}/${maxRetries})`);
-              toast({
-                title: "Tentando novamente",
-                description: `Tentativa ${retryCountRef.current} de ${maxRetries}`,
-                variant: "default"
-              });
-            }
-          } else {
-            console.log('Unknown status value:', status);
+            // Em vez de marcar como failed, tentar atualizar o QR code automaticamente
             toast({
-              title: "Status desconhecido",
-              description: "Recebemos uma resposta inesperada do servidor.",
-              variant: "destructive"
+              title: "Atualizando QR Code",
+              description: "Gerando novo QR code automaticamente...",
+              variant: "default"
+            });
+            
+            retryCountRef.current = 0;
+            await updateQrCode();
+          } else {
+            toast({
+              title: "Aguardando conexão",
+              description: `Tentativa ${retryCountRef.current} de ${maxRetries}`,
+              variant: "default"
             });
           }
         } else {
-          console.log('Response does not have a valid respond property:', responseData);
-          toast({
-            title: "Formato inesperado",
-            description: "A resposta do servidor não está no formato esperado.",
-            variant: "destructive"
-          });
+          console.log('❓ Status desconhecido:', status);
         }
       } else {
-        console.error('Erro ao verificar status:', await response.text());
+        console.error('❌ Erro HTTP:', response.status);
+        const errorText = await response.text();
+        console.error('❌ Erro details:', errorText);
+      }
+    } catch (error) {
+      console.error('💥 Erro na verificação:', error);
+      retryCountRef.current += 1;
+      
+      if (retryCountRef.current >= maxRetries) {
+        if (statusCheckIntervalRef.current !== null) {
+          clearInterval(statusCheckIntervalRef.current);
+          statusCheckIntervalRef.current = null;
+        }
+        setConfirmationStatus('failed');
         toast({
-          title: "Erro na verificação",
-          description: "Não foi possível verificar o status da conexão.",
+          title: "Erro na conexão",
+          description: "Múltiplas falhas na verificação. Tente novamente.",
           variant: "destructive"
         });
       }
-    } catch (error) {
-      console.error('Erro ao verificar status da conexão:', error);
-      toast({
-        title: "Erro de conexão",
-        description: "Ocorreu um erro ao verificar o status da conexão.",
-        variant: "destructive"
-      });
     }
   };
   
   const updateQrCode = async () => {
     try {
       setIsLoading(true);
-      console.log('Updating QR code for instance:', instanceName);
+      console.log('🔄 Atualizando QR code para:', instanceName);
+      
+      // Usar o webhook ID correto para atualizar QR code
       const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/atualizar-qr-code-afiliado', {
         method: 'POST',
         headers: {
@@ -155,45 +153,41 @@ const Evolution = () => {
         }),
       });
       
-      console.log('QR code update response status:', response.status);
+      console.log('📡 QR update response status:', response.status);
       
       if (response.ok) {
         const blob = await response.blob();
-        console.log('Received blob content type:', blob.type);
+        console.log('📷 Blob recebido, tipo:', blob.type);
         
         const qrCodeUrl = URL.createObjectURL(blob);
         setQrCodeData(qrCodeUrl);
         setConfirmationStatus('waiting');
-        retryCountRef.current = 0; // Reset retry counter when getting new QR code
-        console.log('QR code updated successfully');
+        retryCountRef.current = 0;
         
+        // Reiniciar verificação de status
         if (statusCheckIntervalRef.current !== null) {
           clearInterval(statusCheckIntervalRef.current);
         }
         
-        console.log('Starting new polling interval');
+        console.log('🔄 Iniciando novo ciclo de verificação');
         statusCheckIntervalRef.current = window.setInterval(() => {
           checkConnectionStatus();
-        }, 10000);
+        }, 8000); // Diminuí para 8 segundos
         
         toast({
           title: "QR Code atualizado",
-          description: "Escaneie o novo QR code para conectar seu WhatsApp.",
+          description: "Escaneie o novo QR code para conectar.",
         });
       } else {
         const errorText = await response.text();
-        console.error('Falha ao atualizar QR code:', errorText);
-        toast({
-          title: "Erro",
-          description: "Não foi possível atualizar o QR code. Tente novamente.",
-          variant: "destructive"
-        });
+        console.error('❌ Falha ao atualizar QR code:', errorText);
+        throw new Error('Falha ao atualizar QR code');
       }
     } catch (error) {
-      console.error('Erro ao atualizar QR code:', error);
+      console.error('💥 Erro ao atualizar QR code:', error);
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao atualizar o QR code.",
+        description: "Não foi possível atualizar o QR code. Tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -217,112 +211,56 @@ const Evolution = () => {
     retryCountRef.current = 0;
     
     try {
-      console.log('Creating instance with name:', instanceName);
+      console.log('🚀 Criando instância:', instanceName);
       
-      // Primeiro, vamos tentar criar uma instância simulada para teste
-      // Se o webhook principal falhar, vamos simular o processo
-      let response;
-      let useSimulation = false;
+      // Usar o webhook ID correto para criar instância
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          instanceName: instanceName.trim() 
+        }),
+      });
       
-      try {
-        response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instancia-evolution-afiliado', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            instanceName: instanceName.trim() 
-          }),
-        });
-        
-        console.log('Create instance response status:', response.status);
-      } catch (fetchError) {
-        console.warn('Webhook principal falhou, usando modo de simulação:', fetchError);
-        useSimulation = true;
-      }
+      console.log('📡 Create response status:', response.status);
       
-      if (useSimulation || !response?.ok) {
-        // Modo de simulação/fallback
-        console.log('Usando modo de simulação para criar instância');
-        
-        // Criar um QR code simulado (você pode substituir por um QR real quando o backend estiver funcionando)
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 200;
-        canvas.height = 200;
-        
-        // Desenhar um QR code simulado
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, 200, 200);
-        ctx.fillStyle = '#000000';
-        
-        // Desenhar padrão de QR code simples
-        for (let i = 0; i < 200; i += 10) {
-          for (let j = 0; j < 200; j += 10) {
-            if ((i + j) % 20 === 0) {
-              ctx.fillRect(i, j, 8, 8);
-            }
-          }
-        }
-        
-        // Adicionar texto indicativo
-        ctx.fillStyle = '#666666';
-        ctx.font = '12px Arial';
-        ctx.fillText('QR Simulado', 70, 190);
-        ctx.fillText(instanceName, 60, 15);
-        
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const qrCodeUrl = URL.createObjectURL(blob);
-            setQrCodeData(qrCodeUrl);
-            setConfirmationStatus('waiting');
-            
-            // Simular conexão automática após 15 segundos para teste
-            setTimeout(() => {
-              setConfirmationStatus('confirmed');
-              toast({
-                title: "Conexão simulada!",
-                description: `Instância "${instanceName}" conectada em modo de teste.`,
-                variant: "default"
-              });
-            }, 15000);
-            
-            toast({
-              title: "Instância criada (modo simulação)!",
-              description: "QR code gerado para teste. Conexão será simulada em 15s.",
-            });
-          }
-        }, 'image/png');
-        
-      } else {
-        // Processo normal com webhook funcionando
+      if (response.ok) {
         const blob = await response.blob();
-        console.log('Received blob content type:', blob.type);
+        console.log('📷 QR Code blob recebido, tipo:', blob.type);
         
         const qrCodeUrl = URL.createObjectURL(blob);
         setQrCodeData(qrCodeUrl);
         setConfirmationStatus('waiting');
         
+        // Limpar intervalo anterior se existir
         if (statusCheckIntervalRef.current !== null) {
           clearInterval(statusCheckIntervalRef.current);
         }
         
-        console.log('Starting status checking interval');
-        statusCheckIntervalRef.current = window.setInterval(() => {
-          checkConnectionStatus();
-        }, 10000);
+        console.log('🔄 Iniciando verificação de status');
+        // Aguardar 5 segundos antes de começar a verificar (dar tempo para instância inicializar)
+        setTimeout(() => {
+          statusCheckIntervalRef.current = window.setInterval(() => {
+            checkConnectionStatus();
+          }, 8000);
+        }, 5000);
         
         toast({
           title: "Instância criada!",
           description: "Escaneie o QR code para conectar seu WhatsApp.",
         });
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Falha ao criar instância:', errorText);
+        throw new Error('Falha ao criar instância');
       }
-      
     } catch (error) {
-      console.error('Erro ao criar instância:', error);
+      console.error('💥 Erro ao criar instância:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível criar a instância. Verifique a conexão e tente novamente.",
+        description: "Não foi possível criar a instância. Verifique sua conexão e tente novamente.",
         variant: "destructive"
       });
       setConfirmationStatus(null);
@@ -332,17 +270,14 @@ const Evolution = () => {
   };
 
   const handleTryAgain = () => {
-    setIsLoading(true);
-    setQrCodeData(null);
-    setConfirmationStatus(null);
-    retryCountRef.current = 0; // Reset retry counter
+    resetQrCode();
     handleCreateInstance();
   };
 
   const resetQrCode = () => {
     setQrCodeData(null);
     setConfirmationStatus(null);
-    retryCountRef.current = 0; // Reset retry counter
+    retryCountRef.current = 0;
     if (statusCheckIntervalRef.current !== null) {
       clearInterval(statusCheckIntervalRef.current);
       statusCheckIntervalRef.current = null;
@@ -424,6 +359,17 @@ const Evolution = () => {
                             {retryCountRef.current > 0 ? ` (Tentativa ${retryCountRef.current}/${maxRetries})` : '...'}
                           </span>
                         </div>
+                        
+                        <Button 
+                          onClick={updateQrCode}
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          disabled={isLoading}
+                        >
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Atualizar QR Code
+                        </Button>
                       </div>
                     </>
                   ) : confirmationStatus === 'confirmed' ? (
@@ -452,7 +398,7 @@ const Evolution = () => {
                       </div>
                       <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">Falha na Conexão</h3>
                       <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        Não foi possível conectar o WhatsApp à instância <span className="font-semibold">{instanceName}</span> após várias tentativas.
+                        Não foi possível conectar o WhatsApp à instância <span className="font-semibold">{instanceName}</span>.
                       </p>
                       <Button 
                         onClick={handleTryAgain}
@@ -496,6 +442,11 @@ const Evolution = () => {
                         className="dark:bg-gray-700"
                         value={instanceName}
                         onChange={(e) => setInstanceName(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && !isLoading) {
+                            handleCreateInstance();
+                          }
+                        }}
                       />
                     </div>
                   </div>
@@ -504,7 +455,7 @@ const Evolution = () => {
                     <Button 
                       onClick={handleCreateInstance}
                       className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
-                      disabled={isLoading}
+                      disabled={isLoading || !instanceName.trim()}
                     >
                       {isLoading ? (
                         <span className="flex items-center justify-center">
