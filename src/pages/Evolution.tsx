@@ -144,7 +144,7 @@ const Evolution = () => {
     try {
       setIsLoading(true);
       console.log('Updating QR code for instance:', instanceName);
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado', {
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/atualizar-qr-code-afiliado', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ const Evolution = () => {
     
     try {
       console.log('Creating instance with name:', instanceName);
-      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/confirma-afiliado', {
+      const response = await fetch('https://webhook.serverwegrowup.com.br/webhook/instanciaevolution-afiliado', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -315,7 +315,7 @@ const Evolution = () => {
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-800 dark:text-white">
             <Link className="h-6 w-6 text-blue-500 dark:text-blue-400" />
-            Conectar Whatsapp
+            Conectar Evolution
           </h2>
         </div>
         
