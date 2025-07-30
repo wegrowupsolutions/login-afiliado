@@ -20,7 +20,7 @@ export const useEvolutionConnection = () => {
   });
 
   const pollingInterval = useRef<NodeJS.Timeout | null>(null);
-  const maxAttempts = 30;
+  const maxAttempts = 3; // 3 tentativas = 9 segundos
 
   const updateState = useCallback((updates: Partial<ConnectionState>) => {
     setState(prev => ({ ...prev, ...updates }));
