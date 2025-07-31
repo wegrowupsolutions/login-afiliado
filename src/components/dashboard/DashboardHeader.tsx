@@ -28,14 +28,6 @@ const DashboardHeader = () => {
             Bem-vindo, {user?.user_metadata?.name || user?.email}
           </Badge>
           <ThemeToggle />
-          <Button 
-            variant="outline" 
-            onClick={signOut} 
-            className="border-white/30 text-white bg-white/5 hover:bg-white/15 backdrop-blur-sm transition-all duration-300 hover:scale-105"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Sair
-          </Button>
         </div>
       </div>
     </header>
