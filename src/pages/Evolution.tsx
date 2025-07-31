@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2, CheckCircle, XCircle, Smartphone, Wifi, AlertCircle, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, CheckCircle, XCircle, Smartphone, Wifi, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { useEvolutionConnection } from '@/hooks/useEvolutionConnection';
 import { EvolutionApiClient } from '@/utils/evolutionApi';
@@ -13,6 +14,7 @@ import { Label } from '@/components/ui/label';
 const EvolutionConnection = () => {
   const { state, updateState, resetConnection, pollingInterval, maxAttempts } = useEvolutionConnection();
   const [logs, setLogs] = useState<Array<{ message: string; type: string; timestamp: string }>>([]);
+  const navigate = useNavigate();
   
   // Função para adicionar logs
   const addLog = (message: string, type = 'info') => {
@@ -177,6 +179,19 @@ const EvolutionConnection = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-card rounded-lg shadow-lg">
+      {/* Botão Voltar */}
+      <div className="flex items-center mb-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate('/dashboard')}
+          className="text-muted-foreground hover:text-foreground hover:bg-muted"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <span className="ml-2 text-sm text-muted-foreground">Voltar ao Dashboard</span>
+      </div>
+
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-4">
           <Smartphone className="text-green-500" size={32} />
