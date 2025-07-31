@@ -7,6 +7,8 @@ import { useEvolutionConnection } from '@/hooks/useEvolutionConnection';
 import { EvolutionApiClient } from '@/utils/evolutionApi';
 import { validateInstanceName } from '@/utils/evolutionHelpers';
 import { useEvolution } from '@/context/EvolutionContext';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +16,7 @@ import { Label } from '@/components/ui/label';
 const EvolutionConnection = () => {
   const { state, updateState, resetConnection, pollingInterval, maxAttempts } = useEvolutionConnection();
   const { connectedInstance, setConnectedInstance } = useEvolution();
+  const { user } = useAuth();
   const [logs, setLogs] = useState<Array<{ message: string; type: string; timestamp: string }>>([]);
   const navigate = useNavigate();
 
@@ -23,6 +26,42 @@ const EvolutionConnection = () => {
       updateState({ step: 'connected' });
     }
   }, [connectedInstance, updateState]);
+
+  // Carregar instâncias do usuário do Supabase
+  useEffect(() => {
+    if (user?.id && !connectedInstance) {
+      loadUserInstances();
+    }
+  }, [user?.id, connectedInstance]);
+
+  const loadUserInstances = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('evolution_instances')
+        .select('*')
+        .eq('user_id', user?.id)
+        .eq('is_connected', true)
+        .order('connected_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error('Erro ao carregar instâncias:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const instance = data[0];
+        setConnectedInstance({
+          name: instance.instance_name,
+          phoneNumber: instance.phone_number || '',
+          status: 'connected'
+        });
+        addLog(`✅ Instância "${instance.instance_name}" carregada do banco`, 'success');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar instâncias:', error);
+    }
+  };
   
   // Função para adicionar logs
   const addLog = (message: string, type = 'info') => {
@@ -98,9 +137,35 @@ const EvolutionConnection = () => {
           addLog('✅ Conexão estabelecida com sucesso!', 'success');
           
           // Simular número de telefone (seria ideal obter da API real)
+          const phoneNumber = '5511965788543'; // Número simulado
+          
+          // Salvar no Supabase
+          if (user?.id) {
+            try {
+              addLog('💾 Salvando dados no banco...', 'info');
+              const { error } = await supabase.functions.invoke('mark-evolution-connected', {
+                body: {
+                  instanceName: state.instanceName,
+                  phoneNumber: phoneNumber,
+                  userId: user.id
+                }
+              });
+              
+              if (error) {
+                console.error('Erro ao salvar no Supabase:', error);
+                addLog('⚠️ Erro ao salvar dados no banco', 'error');
+              } else {
+                addLog('✅ Dados salvos no banco com sucesso!', 'success');
+              }
+            } catch (err) {
+              console.error('Erro ao chamar função:', err);
+              addLog('⚠️ Erro ao salvar dados no banco', 'error');
+            }
+          }
+          
           setConnectedInstance({
             name: state.instanceName,
-            phoneNumber: '5511965788543', // Número simulado
+            phoneNumber: phoneNumber,
             status: 'connected'
           });
           
@@ -185,8 +250,36 @@ const EvolutionConnection = () => {
   };
 
   // Função para desconectar instância
-  const handleDisconnect = () => {
-    addLog(`Desconectando instância: ${connectedInstance?.name}`, 'info');
+  const handleDisconnect = async () => {
+    if (!connectedInstance) return;
+    
+    addLog(`Desconectando instância: ${connectedInstance.name}`, 'info');
+    
+    // Atualizar no banco para marcar como desconectada
+    if (user?.id) {
+      try {
+        const { error } = await supabase
+          .from('evolution_instances')
+          .update({ 
+            is_connected: false, 
+            disconnected_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id)
+          .eq('instance_name', connectedInstance.name);
+        
+        if (error) {
+          console.error('Erro ao desconectar no banco:', error);
+          addLog('⚠️ Erro ao atualizar status no banco', 'error');
+        } else {
+          addLog('✅ Status atualizado no banco', 'success');
+        }
+      } catch (err) {
+        console.error('Erro ao atualizar banco:', err);
+        addLog('⚠️ Erro ao atualizar status no banco', 'error');
+      }
+    }
+    
     setConnectedInstance(null);
     updateState({ step: 'idle', instanceName: '', error: '' });
   };
@@ -198,7 +291,24 @@ const EvolutionConnection = () => {
     addLog(`Excluindo instância: ${connectedInstance.name}`, 'info');
     
     try {
-      // Aqui você chamaria a API para excluir a instância
+      // Excluir do banco de dados
+      if (user?.id) {
+        const { error } = await supabase
+          .from('evolution_instances')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('instance_name', connectedInstance.name);
+        
+        if (error) {
+          console.error('Erro ao excluir do banco:', error);
+          addLog('⚠️ Erro ao excluir do banco', 'error');
+          return;
+        }
+        
+        addLog('✅ Instância excluída do banco', 'success');
+      }
+      
+      // Aqui você chamaria a API para excluir a instância do Evolution
       // await EvolutionApiClient.deleteInstance(connectedInstance.name);
       
       addLog('Instância excluída com sucesso!', 'success');
