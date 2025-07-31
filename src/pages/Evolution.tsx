@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, CheckCircle, XCircle, Smartphone, Wifi, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Smartphone, Wifi, AlertCircle, RefreshCw, ArrowLeft, Power, Trash2 } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { useEvolutionConnection } from '@/hooks/useEvolutionConnection';
 import { EvolutionApiClient } from '@/utils/evolutionApi';
@@ -14,6 +14,10 @@ import { Label } from '@/components/ui/label';
 const EvolutionConnection = () => {
   const { state, updateState, resetConnection, pollingInterval, maxAttempts } = useEvolutionConnection();
   const [logs, setLogs] = useState<Array<{ message: string; type: string; timestamp: string }>>([]);
+  const [connectedInstance, setConnectedInstance] = useState<{
+    name: string;
+    phoneNumber: string;
+  } | null>(null);
   const navigate = useNavigate();
   
   // Função para adicionar logs
@@ -88,6 +92,13 @@ const EvolutionConnection = () => {
           console.log('✅ CONEXÃO CONFIRMADA!');
           clearInterval(interval);
           addLog('✅ Conexão estabelecida com sucesso!', 'success');
+          
+          // Simular número de telefone (seria ideal obter da API real)
+          setConnectedInstance({
+            name: state.instanceName,
+            phoneNumber: '5511965788543' // Número simulado
+          });
+          
           updateState({ step: 'connected' });
           return;
         }
@@ -164,7 +175,33 @@ const EvolutionConnection = () => {
   const handleReset = () => {
     stopPolling();
     resetConnection();
+    setConnectedInstance(null);
     setLogs([]);
+  };
+
+  // Função para desconectar instância
+  const handleDisconnect = () => {
+    addLog(`Desconectando instância: ${connectedInstance?.name}`, 'info');
+    setConnectedInstance(null);
+    updateState({ step: 'idle', instanceName: '', error: '' });
+  };
+
+  // Função para excluir instância
+  const handleDelete = async () => {
+    if (!connectedInstance) return;
+    
+    addLog(`Excluindo instância: ${connectedInstance.name}`, 'info');
+    
+    try {
+      // Aqui você chamaria a API para excluir a instância
+      // await EvolutionApiClient.deleteInstance(connectedInstance.name);
+      
+      addLog('Instância excluída com sucesso!', 'success');
+      setConnectedInstance(null);
+      updateState({ step: 'idle', instanceName: '', error: '' });
+    } catch (err: any) {
+      addLog(`Erro ao excluir instância: ${err.message}`, 'error');
+    }
   };
 
   // Cleanup
@@ -291,25 +328,53 @@ const EvolutionConnection = () => {
       )}
 
 
-      {/* Sucesso - Conectado */}
-      {state.step === 'connected' && (
-        <div className="text-center space-y-4">
-          <div className="bg-green-50 dark:bg-green-950/30 p-6 rounded-lg">
-            <CheckCircle className="mx-auto mb-4 text-green-500" size={48} />
-            <h3 className="text-lg font-semibold text-green-700 dark:text-green-400 mb-2">
-              🎉 Conexão Realizada com Sucesso!
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              Sua instância <strong>{state.instanceName}</strong> está conectada e pronta para uso.
-            </p>
+      {/* Sucesso - Instância Conectada */}
+      {state.step === 'connected' && connectedInstance && (
+        <div className="space-y-6">
+          {/* Card da Instância Conectada */}
+          <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                  <Smartphone className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-card-foreground">
+                    {connectedInstance.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {connectedInstance.phoneNumber}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                  Connected
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button
+                onClick={handleDisconnect}
+                variant="outline"
+                size="sm"
+                className="flex-1 border-orange-500/20 text-orange-600 hover:bg-orange-500/10"
+              >
+                <Power className="h-4 w-4 mr-2" />
+                Desconectar
+              </Button>
+              <Button
+                onClick={handleDelete}
+                variant="outline"
+                size="sm"
+                className="flex-1 border-red-500/20 text-red-600 hover:bg-red-500/10"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir
+              </Button>
+            </div>
           </div>
-          
-          <button
-            onClick={handleReset}
-            className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
-          >
-            🔄 Conectar Nova Instância
-          </button>
         </div>
       )}
 
