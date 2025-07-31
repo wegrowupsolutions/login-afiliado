@@ -286,6 +286,32 @@ const EvolutionConnection = () => {
         </div>
       )}
 
+      {/* Tela de Carregamento - Gerando QR Code */}
+      {state.step === 'creating' && (
+        <div className="text-center space-y-6">
+          <div className="bg-muted p-8 rounded-lg">
+            <div className="flex items-center justify-center mb-4">
+              <Loader2 className="animate-spin text-primary" size={48} />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">🔄 Gerando QR Code</h3>
+            <p className="text-muted-foreground">
+              Aguarde um momento, estamos preparando sua conexão...
+            </p>
+            <div className="mt-4 text-sm text-muted-foreground">
+              Instância: <span className="font-medium text-foreground">{state.instanceName}</span>
+            </div>
+          </div>
+          
+          <button
+            onClick={handleReset}
+            className="w-full bg-muted text-muted-foreground py-2 px-4 rounded-lg hover:bg-muted/80 flex items-center justify-center gap-2"
+          >
+            <XCircle size={16} />
+            ❌ Cancelar
+          </button>
+        </div>
+      )}
+
       {/* QR Code + Verificação Automática */}
       {(state.step === 'qr_code' || state.step === 'connecting') && (
         <div className="text-center space-y-6">
