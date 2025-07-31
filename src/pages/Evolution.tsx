@@ -6,7 +6,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { useEvolutionConnection } from '@/hooks/useEvolutionConnection';
 import { EvolutionApiClient } from '@/utils/evolutionApi';
 import { validateInstanceName } from '@/utils/evolutionHelpers';
-import { EvolutionProvider, useEvolution } from '@/context/EvolutionContext';
+import { useEvolution } from '@/context/EvolutionContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -475,12 +475,10 @@ const EvolutionConnection = () => {
 
 const Evolution = () => {
   return (
-    <EvolutionProvider>
-      <div className="container mx-auto py-6 space-y-6">
-        <DashboardHeader />
-        <EvolutionConnection />
-      </div>
-    </EvolutionProvider>
+    <div className="container mx-auto py-6 space-y-6">
+      <DashboardHeader />
+      <EvolutionConnection />
+    </div>
   );
 };
 

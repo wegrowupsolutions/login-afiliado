@@ -18,6 +18,7 @@ import Academia from "./pages/Academia";
 import AgentConfig from "./pages/AgentConfig";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { EvolutionProvider } from "./context/EvolutionContext";
 import AdminRoute from "./components/layout/AdminRoute";
 
 const queryClient = new QueryClient();
@@ -30,29 +31,31 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/metrics" element={<MetricsDashboard />} />
-              <Route path="/chats" element={<ChatsDashboard />} />
-              <Route path="/knowledge" element={<KnowledgeManager />} />
-              <Route path="/clients" element={<ClientsDashboard />} />
-              <Route path="/evolution" element={<Evolution />} />
-              <Route path="/schedule" element={
-                <AdminRoute>
-                  <Schedule />
-                </AdminRoute>
-              } />
-              <Route path="/academia" element={<Academia />} />
-              <Route path="/configuration" element={
-                <AdminRoute>
-                  <ConfigurationManager />
-                </AdminRoute>
-              } />
-              <Route path="/config" element={<AgentConfig />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <EvolutionProvider>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/metrics" element={<MetricsDashboard />} />
+                <Route path="/chats" element={<ChatsDashboard />} />
+                <Route path="/knowledge" element={<KnowledgeManager />} />
+                <Route path="/clients" element={<ClientsDashboard />} />
+                <Route path="/evolution" element={<Evolution />} />
+                <Route path="/schedule" element={
+                  <AdminRoute>
+                    <Schedule />
+                  </AdminRoute>
+                } />
+                <Route path="/academia" element={<Academia />} />
+                <Route path="/configuration" element={
+                  <AdminRoute>
+                    <ConfigurationManager />
+                  </AdminRoute>
+                } />
+                <Route path="/config" element={<AgentConfig />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </EvolutionProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
