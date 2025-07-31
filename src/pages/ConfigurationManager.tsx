@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 const endpointGroups = {
   'Configuração do Bot': [
     { id: 'webhook_mensagem', label: 'Enviar Mensagem', key: 'webhook_mensagem' },
+    { id: 'webhook_mensagem_afiliado', label: 'Enviar Mensagem Afiliado', key: 'webhook_mensagem_afiliado' },
     { id: 'webhook_pausa_bot', label: 'Pausar Bot', key: 'webhook_pausa_bot' },
     { id: 'webhook_inicia_bot', label: 'Iniciar Bot', key: 'webhook_inicia_bot' },
     { id: 'webhook_confirma', label: 'Confirmar', key: 'webhook_confirma' }
