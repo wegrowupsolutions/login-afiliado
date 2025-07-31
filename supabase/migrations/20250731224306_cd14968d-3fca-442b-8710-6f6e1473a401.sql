@@ -1,0 +1,1 @@
+UPDATE system_configurations SET value = 'https://webhook.serverwegrowup.com.br/webhook/pausa-bot-afiliado', updated_at = now() WHERE key = 'webhook_pausa_bot';
