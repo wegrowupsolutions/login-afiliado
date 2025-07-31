@@ -1,18 +1,27 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { EvolutionInstance } from '@/types/evolution';
 
+interface ConnectedInstance {
+  name: string;
+  phoneNumber: string;
+  status: 'connected';
+}
+
 interface EvolutionContextType {
   instances: EvolutionInstance[];
+  connectedInstance: ConnectedInstance | null;
   addInstance: (instance: EvolutionInstance) => void;
   updateInstance: (name: string, updates: Partial<EvolutionInstance>) => void;
   removeInstance: (name: string) => void;
   getInstanceByName: (name: string) => EvolutionInstance | undefined;
+  setConnectedInstance: (instance: ConnectedInstance | null) => void;
 }
 
 const EvolutionContext = createContext<EvolutionContextType | undefined>(undefined);
 
 export const EvolutionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [instances, setInstances] = useState<EvolutionInstance[]>([]);
+  const [connectedInstance, setConnectedInstance] = useState<ConnectedInstance | null>(null);
 
   const addInstance = useCallback((instance: EvolutionInstance) => {
     setInstances(prev => {
@@ -42,10 +51,12 @@ export const EvolutionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const value = {
     instances,
+    connectedInstance,
     addInstance,
     updateInstance,
     removeInstance,
-    getInstanceByName
+    getInstanceByName,
+    setConnectedInstance
   };
 
   return (

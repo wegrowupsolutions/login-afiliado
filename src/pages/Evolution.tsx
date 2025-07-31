@@ -6,19 +6,23 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { useEvolutionConnection } from '@/hooks/useEvolutionConnection';
 import { EvolutionApiClient } from '@/utils/evolutionApi';
 import { validateInstanceName } from '@/utils/evolutionHelpers';
-import { EvolutionProvider } from '@/context/EvolutionContext';
+import { EvolutionProvider, useEvolution } from '@/context/EvolutionContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 const EvolutionConnection = () => {
   const { state, updateState, resetConnection, pollingInterval, maxAttempts } = useEvolutionConnection();
+  const { connectedInstance, setConnectedInstance } = useEvolution();
   const [logs, setLogs] = useState<Array<{ message: string; type: string; timestamp: string }>>([]);
-  const [connectedInstance, setConnectedInstance] = useState<{
-    name: string;
-    phoneNumber: string;
-  } | null>(null);
   const navigate = useNavigate();
+
+  // Verificar se há instância conectada ao carregar a página
+  useEffect(() => {
+    if (connectedInstance) {
+      updateState({ step: 'connected' });
+    }
+  }, [connectedInstance, updateState]);
   
   // Função para adicionar logs
   const addLog = (message: string, type = 'info') => {
@@ -96,7 +100,8 @@ const EvolutionConnection = () => {
           // Simular número de telefone (seria ideal obter da API real)
           setConnectedInstance({
             name: state.instanceName,
-            phoneNumber: '5511965788543' // Número simulado
+            phoneNumber: '5511965788543', // Número simulado
+            status: 'connected'
           });
           
           updateState({ step: 'connected' });
