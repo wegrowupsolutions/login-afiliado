@@ -30,10 +30,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state changed:', event);
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Update active session on every auth state change
+        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          try {
+            // Update or create active session
+            await supabase.from('active_sessions').upsert({
+              user_id: session.user.id,
+              session_id: session.access_token.substring(0, 20),
+              device_info: {
+                userAgent: navigator.userAgent.substring(0, 200),
+                platform: navigator.platform,
+                language: navigator.language,
+                timestamp: new Date().toISOString()
+              },
+              ip_address: 'client_side',
+              is_active: true,
+              last_activity: new Date().toISOString()
+            }, {
+              onConflict: 'user_id,session_id'
+            });
+          } catch (error) {
+            console.error('Error updating active session:', error);
+          }
+        }
+        
         setIsLoading(false);
       }
     );
